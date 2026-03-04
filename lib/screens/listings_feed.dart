@@ -1,5 +1,7 @@
+import 'package:campus_housing/screens/addlisting.dart';
 import 'package:flutter/material.dart';
-import 'searchpage.dart'; // Ensure filename is correct
+import 'searchpage.dart';
+// Import the search page
 
 class ListingsFeed extends StatefulWidget {
   const ListingsFeed({Key? key}) : super(key: key);
@@ -46,6 +48,18 @@ class _ListingsFeedState extends State<ListingsFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Inside listings_feed.dart Scaffold
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddListingPage()),
+          );
+        },
+        label: const Text("Post Listing"),
+        icon: const Icon(Icons.add),
+        backgroundColor: Colors.pinkAccent,
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: CustomScrollView(
