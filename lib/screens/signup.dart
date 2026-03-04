@@ -1,7 +1,9 @@
 // ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import 'login.dart';
 import 'listings_feed.dart';
 
@@ -17,10 +19,9 @@ class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
-  String? _selectedRole;
-  bool _isLoading = false;
 
-  final supabase = Supabase.instance.client;
+  bool _isLoading = false;
+  String? _selectedRole;
 
   @override
   void dispose() {
@@ -31,73 +32,63 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _handleSignup() async {
-    if (!_formKey.currentState!.validate() || _selectedRole == null) return;
+    if (_formKey.currentState!.validate() && _selectedRole != null) {
+      setState(() => _isLoading = true);
 
-    setState(() => _isLoading = true);
+      try {
+        final auth = context.read<AuthProvider>();
+        bool success = false;
 
-    try {
-      final res = await supabase.auth.signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+        // Role-based signup
+        if (_selectedRole == 'landlord') {
+          success = await auth.signupLandlord(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            phone: _phoneController.text.trim(),
+          );
+        } else if (_selectedRole == 'student') {
+          success = await auth.signupStudent(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            phone: _phoneController.text.trim(),
+          );
+        }
 
-      if (res.user != null && mounted) {
-        final userId = res.user!.id;
-
-        // Insert profile in users table
-        final insertRes = await supabase.from('users').insert({
-          'id': userId,
-          'email': _emailController.text.trim(),
-          'phone': _phoneController.text.trim(),
-          'role': _selectedRole,
-        })._execute();
-
-        if (insertRes?.error != null) {
+        if (success && mounted) {
+          Navigator.of(
+            context,
+          ).pushReplacement(MaterialPageRoute(builder: (_) => ListingsFeed()));
+        } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Error saving profile: ${insertRes.error!.message}',
-              ),
+            const SnackBar(
+              content: Text('Signup failed. Check your inputs.'),
               backgroundColor: Colors.red,
             ),
           );
-          return;
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signup successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => ListingsFeedPage()),
-        );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signup failed. Email may already exist.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    } else {
+      // No role selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a role'),
+          backgroundColor: Colors.orange,
+        ),
+      );
     }
   }
 
+  /// GLASS ROLE CARD
   Widget _roleCard(String title, IconData icon, String value) {
     final isSelected = _selectedRole == value;
 
     return GestureDetector(
-      onTap: () => setState(() => _selectedRole = value),
+      onTap: () {
+        setState(() => _selectedRole = value);
+        print('Role selected: $_selectedRole'); // debug to verify selection
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
@@ -136,6 +127,7 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       body: Stack(
         children: [
+          // BACKGROUND
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -144,7 +136,11 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
           ),
+
+          // DARK OVERLAY
           Container(color: Colors.black.withOpacity(0.3)),
+
+          // CONTENT
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -159,6 +155,8 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                   const SizedBox(height: 30),
+
+                  // GLASS FORM
                   ClipRRect(
                     borderRadius: BorderRadius.circular(25),
                     child: BackdropFilter(
@@ -188,7 +186,7 @@ class _SignupPageState extends State<SignupPage> {
                                 style: const TextStyle(color: Colors.white),
                                 decoration: _glassInput("Password", Icons.lock),
                                 validator: (v) =>
-                                    v!.length < 6 ? "Min 6 chars" : null,
+                                    v!.length < 6 ? "Min 6 characters" : null,
                               ),
                               const SizedBox(height: 16),
                               TextFormField(
@@ -225,7 +223,10 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 30),
+
+                  // ROLE CARDS
                   Row(
                     children: [
                       Expanded(
@@ -238,6 +239,8 @@ class _SignupPageState extends State<SignupPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
+
+                  // LOGIN LINK
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
@@ -257,6 +260,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
+  // GLASS INPUT DECORATION
   InputDecoration _glassInput(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
@@ -268,15 +272,3 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 }
-
-extension on Object? {
-  get error => null;
-}
-
-extension on PostgrestFilterBuilder<dynamic> {
-  Future<Object?> _execute() async {
-    return null;
-  }
-}
-
-extension on PostgrestResponse<dynamic> {}

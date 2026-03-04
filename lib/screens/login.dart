@@ -46,9 +46,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => ListingsFeedPage()),
-        );
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (_) => ListingsFeed()));
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

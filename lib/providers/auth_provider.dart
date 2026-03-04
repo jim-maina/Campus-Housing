@@ -22,6 +22,8 @@ class AuthProvider extends ChangeNotifier {
     return null;
   }
 
+  bool? get isInitializing => null;
+
   /// Sign up a student
   /// In a real app, this would send data to a backend server
   Future<bool> signupStudent({
