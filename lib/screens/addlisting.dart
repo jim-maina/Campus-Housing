@@ -9,6 +9,16 @@ class AddListingPage extends StatefulWidget {
 
 class _AddListingPageState extends State<AddListingPage> {
   String _selectedCategory = 'House';
+  String _selectedArea = 'Nchiru';
+
+  final List<String> _areas = [
+    'Nchiru',
+    'Mascan',
+    'Alaban',
+    'Kunene',
+    'Kianjae',
+    'Kaithe',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -32,59 +42,55 @@ class _AddListingPageState extends State<AddListingPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Property Details",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              "Step 1: Location & Type",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // Photo Placeholder Box
-            Container(
-              height: 180,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.grey.shade300),
+            // Area Dropdown
+            DropdownButtonFormField<String>(
+              value: _selectedArea,
+              decoration: const InputDecoration(
+                labelText: "Which Area?",
+                border: OutlineInputBorder(),
               ),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add_a_photo, size: 40, color: Colors.pinkAccent),
-                  SizedBox(height: 10),
-                  Text("Add Photos", style: TextStyle(color: Colors.grey)),
-                ],
-              ),
+              items: _areas
+                  .map(
+                    (area) => DropdownMenuItem(value: area, child: Text(area)),
+                  )
+                  .toList(),
+              onChanged: (val) => setState(() => _selectedArea = val!),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             // Category Dropdown
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               decoration: const InputDecoration(
-                labelText: "What are you listing?",
+                labelText: "Category",
                 border: OutlineInputBorder(),
               ),
-              items: ['House', 'Activity'].map((String category) {
-                return DropdownMenuItem(value: category, child: Text(category));
-              }).toList(),
+              items: ['House', 'Activity']
+                  .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+                  .toList(),
               onChanged: (val) => setState(() => _selectedCategory = val!),
             ),
 
+            const SizedBox(height: 30),
+            const Text(
+              "Step 2: Details",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 20),
 
-            // Title Input
             const TextField(
               decoration: InputDecoration(
                 labelText: "Title",
-                hintText: "e.g. Modern Studio near Gate 1",
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Price Input
             const TextField(
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
@@ -95,8 +101,6 @@ class _AddListingPageState extends State<AddListingPage> {
             ),
 
             const SizedBox(height: 40),
-
-            // The Publish Button
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -104,11 +108,11 @@ class _AddListingPageState extends State<AddListingPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.pinkAccent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 onPressed: () {
-                  // This will eventually save the data
+                  // Final Action: Send to Database
                   Navigator.pop(context);
                 },
                 child: const Text(
