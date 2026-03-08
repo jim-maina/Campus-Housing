@@ -252,10 +252,10 @@ packages:
     dependency: transitive
     description:
       name: hooks
-      sha256: "7a08a0d684cb3b8fb604b78455d5d352f502b68079f7b80b831c62220ab0a4f6"
+      sha256: e79ed1e8e1929bc6ecb6ec85f0cb519c887aa5b423705ded0d0f2d9226def388
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   http:
     dependency: transitive
     description:
@@ -356,18 +356,18 @@ packages:
     dependency: transitive
     description:
       name: mime
-      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
+      sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "2.0.0"
   native_toolchain_c:
     dependency: transitive
     description:
       name: native_toolchain_c
-      sha256: "89e83885ba09da5fdf2cdacc8002a712ca238c28b7f717910b34bcd27b0d03ac"
+      sha256: "92b2ca62c8bd2b8d2f267cdfccf9bfbdb7322f778f8f91b3ce5b5cda23a3899f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.17.4"
+    version: "0.17.5"
   nested:
     dependency: transitive
     description:
@@ -524,10 +524,10 @@ packages:
     dependency: transitive
     description:
       name: rxdart
-      sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
+      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
       url: "https://pub.dev"
     source: hosted
-    version: "0.27.7"
+    version: "0.28.0"
   shared_preferences:
     dependency: transitive
     description:
@@ -753,18 +753,26 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
+      sha256: "868d88a33d8a87b18ffc05f9f030ba328ffefba92d6c127917a2ba740f9cfe4a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "1.1.1"
+  web_socket:
+    dependency: transitive
+    description:
+      name: web_socket
+      sha256: "34d64019aa8e36bf9842ac014bb5d2f5586ca73df5e4d9bf5c936975cae6982c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: "58c6666b342a38816b2e7e50ed0f1e261959630becd4c879c4f26bfa14aa5a42"
+      sha256: d645757fb0f4773d602444000a8131ff5d48c9e47adfe9772652dd1a4f2d45c8
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.5"
+    version: "3.0.3"
   xdg_directories:
     dependency: transitive
     description:

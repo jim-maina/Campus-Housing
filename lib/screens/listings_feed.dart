@@ -79,48 +79,163 @@ class _ListingsFeedState extends State<ListingsFeed> {
                   _buildAreaRow("Nchiru", [
                     {
                       'title': 'Blue House',
-                      'price': 'ksh 6,000',
-                      'img': 'images/bluehouse.jpg',
+                      'price': 'ksh 3,500',
+                      'img': 'images/nchiru/bluehouse.jpg',
                     },
                     {
                       'title': 'Green House',
+                      'price': 'ksh 3,000',
+                      'img': 'images/nchiru/greenhouse.jpg',
+                    },
+                    {
+                      'title': 'Orange House',
+                      'price': 'ksh 4,000',
+                      'img': 'images/nchiru/orangehouse.jpg',
+                    },
+                    {
+                      'title': 'Villa House',
                       'price': 'ksh 5,000',
-                      'img': 'images/greenhouse.jpg',
+                      'img': 'images/nchiru/villahouse.jpg',
+                    },
+                    {
+                      'title': 'Pink House',
+                      'price': 'ksh 6,000',
+                      'img': 'images/nchiru/pinkhouse.jpg',
                     },
                   ]),
                   _buildAreaRow("Mascan", [
                     {
                       'title': 'Mascan Studios',
                       'price': 'ksh 4,500',
-                      'img': 'images/mascan.jpg',
+                      'img': 'images/mascan/mascan.jpg',
+                    },
+                    {
+                      'title': 'Studio House',
+                      'price': 'ksh 5,000',
+                      'img': 'images/mascan/studiohouse.jpg',
+                    },
+                    {
+                      'title': 'Cozy House',
+                      'price': 'ksh 6,000',
+                      'img': 'images/mascan/cozyhouse.jpg',
+                    },
+                    {
+                      'title': 'Fun Villa',
+                      'price': 'ksh 5,000',
+                      'img': 'images/mascan/funvilla.jpg',
+                    },
+                    {
+                      'title': 'Campus Villa',
+                      'price': 'ksh 4,000',
+                      'img': 'images/mascan/campusvilla.jpg',
                     },
                   ]),
                   _buildAreaRow("Alaban", [
                     {
-                      'title': 'Mascan Studios',
+                      'title': 'Unity Gardens',
                       'price': 'ksh 4,500',
-                      'img': 'images/mascan.jpg',
+                      'img': 'images/alaban/unitygardens.jpg',
+                    },
+                    {
+                      'title': 'Freedom House',
+                      'price': 'ksh 3,000',
+                      'img': 'images/alaban/freedomhouse.jpg',
+                    },
+                    {
+                      'title': 'Ubuntu House',
+                      'price': 'ksh 5,000',
+                      'img': 'images/alaban/ubuntuhouse.jpg',
+                    },
+                    {
+                      'title': 'Sunset Villa',
+                      'price': 'ksh 4,000',
+                      'img': 'images/alaban/sunsetvilla.jpg',
+                    },
+                    {
+                      'title': 'Commonwealth House',
+                      'price': 'ksh 7,000',
+                      'img': 'images/alaban/commonwealthhouse.jpg',
                     },
                   ]),
                   _buildAreaRow("Kunene", [
                     {
-                      'title': 'Mascan Studios',
+                      'title': 'Qwetu Residences',
                       'price': 'ksh 4,500',
-                      'img': 'images/mascan.jpg',
+                      'img': 'images/kunene/qweturesidences.jpg',
+                    },
+                    {
+                      'title': 'Campus View',
+                      'price': 'ksh 6,000',
+                      'img': 'images/kunene/campusview.jpg',
+                    },
+                    {
+                      'title': 'Scholar Corners',
+                      'price': 'ksh 5,500',
+                      'img': 'images/kunene/scholarcorners.jpg',
+                    },
+                    {
+                      'title': 'NextDoor Residences',
+                      'price': 'ksh 4,000',
+                      'img': 'images/kunene/nextdoorresidences.jpg',
+                    },
+                    {
+                      'title': 'Student Square',
+                      'price': 'ksh 3,000',
+                      'img': 'images/kunene/studentsquare.jpg',
                     },
                   ]),
                   _buildAreaRow("Kianjae", [
                     {
-                      'title': 'Mascan Studios',
+                      'title': 'Unity Flats',
                       'price': 'ksh 4,500',
-                      'img': 'images/mascan.jpg',
+                      'img': 'images/kianjae/unityflats.jpg',
+                    },
+                    {
+                      'title': 'Vibing Villa',
+                      'price': 'ksh 6,000',
+                      'img': 'images/kianjae/vibingvilla.jpg',
+                    },
+                    {
+                      'title': 'Cornerstone Ridge',
+                      'price': 'ksh 3,000',
+                      'img': 'images/kianjae/cornerstoneridge.jpg',
+                    },
+                    {
+                      'title': 'Study Yard Residences',
+                      'price': 'ksh 7,000',
+                      'img': 'images/kianjae/studyyardresidences.jpg',
+                    },
+                    {
+                      'title': 'Campus Green',
+                      'price': 'ksh 5,000',
+                      'img': 'images/kianjae/campusgreen.jpg',
                     },
                   ]),
                   _buildAreaRow("Kaithe", [
                     {
-                      'title': 'Mascan Studios',
-                      'price': 'ksh 4,500',
-                      'img': 'images/mascan.jpg',
+                      'title': 'Tajiri Residences',
+                      'price': 'ksh 6,500',
+                      'img': 'images/kaithe/tajiriresidences.jpg',
+                    },
+                    {
+                      'title': 'Kaithe Studios',
+                      'price': 'ksh 4,000',
+                      'img': 'images/kaithe/studios.jpg',
+                    },
+                    {
+                      'title': 'Fancy Flats',
+                      'price': 'ksh 3,000',
+                      'img': 'images/kaithe/fancyflats.jpg',
+                    },
+                    {
+                      'title': 'Student Hub',
+                      'price': 'ksh 3,000',
+                      'img': 'images/kaithe/studenthub.jpg',
+                    },
+                    {
+                      'title': 'Youth Villa',
+                      'price': 'ksh 7,000',
+                      'img': 'images/kaithe/youthvilla.jpg',
                     },
                   ]),
                 ]),
