@@ -71,7 +71,7 @@ class _AddListingPageState extends State<AddListingPage> {
                 labelText: "Category",
                 border: OutlineInputBorder(),
               ),
-              items: ['House', 'Activity']
+              items: ['House']
                   .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
                   .toList(),
               onChanged: (val) => setState(() => _selectedCategory = val!),

@@ -1,15 +1,15 @@
-//This is the signup page for landlords. It allows them to create an account using their phone number and full name. The phone number will be used for students to contact them about their listings.
+//This is the signup page for students.
 import 'package:flutter/material.dart';
 
-class SignupPage extends StatefulWidget {
+class StudentsignupPage extends StatefulWidget {
   final VoidCallback onAuthSuccess;
-  const SignupPage({super.key, required this.onAuthSuccess});
+  const StudentsignupPage({super.key, required this.onAuthSuccess});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<StudentsignupPage> createState() => _StudentsignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _StudentsignupPageState extends State<StudentsignupPage> {
   bool _isLogin = false;
 
   @override
@@ -27,14 +27,14 @@ class _SignupPageState extends State<SignupPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isLogin ? "Welcome Back" : "Register as Landlord",
+              _isLogin ? "Welcome Back" : "Register as Student",
               style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
               _isLogin
                   ? "Enter your phone to login"
-                  : "Students will contact you via this number",
+                  : "Landlords will contact you via this number",
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 40),
@@ -100,7 +100,7 @@ class _SignupPageState extends State<SignupPage> {
                 onPressed: () => setState(() => _isLogin = !_isLogin),
                 child: Text(
                   _isLogin
-                      ? "New Landlord? Sign Up"
+                      ? "New to this app? Sign Up"
                       : "Already have an account? Login",
                   style: const TextStyle(
                     color: Colors.black,

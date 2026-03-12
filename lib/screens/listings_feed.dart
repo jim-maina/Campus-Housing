@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'signup.dart';
+import 'landlordsignup.dart';
 import 'addlisting.dart';
 import 'searchpage.dart';
 import 'listingdetail.dart';
+import 'studentsignup.dart';
 
 class ListingsFeed extends StatefulWidget {
   const ListingsFeed({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SignupPage(
+                builder: (context) => LandlordSignupPage(
                   onAuthSuccess: () {
                     setState(() => isLoggedIn = true);
                     Navigator.pushReplacement(
@@ -62,12 +63,14 @@ class _ListingsFeedState extends State<ListingsFeed> {
                 child: Row(
                   children: [
                     _buildCategoryTab(0, "Homes", Icons.home_rounded),
-                    const SizedBox(width: 30),
+                    const SizedBox(width: 100),
                     _buildCategoryTab(
                       1,
                       "Activities",
                       Icons.local_activity_rounded,
                     ),
+                    const SizedBox(width: 100),
+                    _buildCategoryTab(2, "roommates", Icons.people_rounded),
                   ],
                 ),
               ),
@@ -79,166 +82,229 @@ class _ListingsFeedState extends State<ListingsFeed> {
                   _buildAreaRow("Nchiru", [
                     {
                       'title': 'Blue House',
-                      'price': 'ksh 3,500',
+                      'price': 3500,
                       'img': 'images/nchiru/bluehouse.jpg',
                     },
                     {
                       'title': 'Green House',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/nchiru/greenhouse.jpg',
                     },
                     {
                       'title': 'Orange House',
-                      'price': 'ksh 4,000',
+                      'price': 4000,
                       'img': 'images/nchiru/orangehouse.jpg',
                     },
                     {
                       'title': 'Villa House',
-                      'price': 'ksh 5,000',
+                      'price': 5000,
                       'img': 'images/nchiru/villahouse.jpg',
                     },
                     {
                       'title': 'Pink House',
-                      'price': 'ksh 6,000',
+                      'price': 6000,
                       'img': 'images/nchiru/pinkhouse.jpg',
                     },
                   ]),
                   _buildAreaRow("Mascan", [
                     {
                       'title': 'Mascan Studios',
-                      'price': 'ksh 4,500',
+                      'price': 4500,
                       'img': 'images/mascan/mascan.jpg',
                     },
                     {
                       'title': 'Studio House',
-                      'price': 'ksh 5,000',
+                      'price': 5000,
                       'img': 'images/mascan/studiohouse.jpg',
                     },
                     {
                       'title': 'Cozy House',
-                      'price': 'ksh 6,000',
+                      'price': 6000,
                       'img': 'images/mascan/cozyhouse.jpg',
                     },
                     {
                       'title': 'Fun Villa',
-                      'price': 'ksh 5,000',
+                      'price': 5000,
                       'img': 'images/mascan/funvilla.jpg',
                     },
                     {
                       'title': 'Campus Villa',
-                      'price': 'ksh 4,000',
+                      'price': 4000,
                       'img': 'images/mascan/campusvilla.jpg',
                     },
                   ]),
                   _buildAreaRow("Alaban", [
                     {
                       'title': 'Unity Gardens',
-                      'price': 'ksh 4,500',
+                      'price': 4500,
                       'img': 'images/alaban/unitygardens.jpg',
                     },
                     {
                       'title': 'Freedom House',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/alaban/freedomhouse.jpg',
                     },
                     {
                       'title': 'Ubuntu House',
-                      'price': 'ksh 5,000',
+                      'price': 5000,
                       'img': 'images/alaban/ubuntuhouse.jpg',
                     },
                     {
                       'title': 'Sunset Villa',
-                      'price': 'ksh 4,000',
+                      'price': 4000,
                       'img': 'images/alaban/sunsetvilla.jpg',
                     },
                     {
                       'title': 'Commonwealth House',
-                      'price': 'ksh 7,000',
+                      'price': 7000,
                       'img': 'images/alaban/commonwealthhouse.jpg',
                     },
                   ]),
                   _buildAreaRow("Kunene", [
                     {
                       'title': 'Qwetu Residences',
-                      'price': 'ksh 4,500',
+                      'price': 4500,
                       'img': 'images/kunene/qweturesidences.jpg',
                     },
                     {
                       'title': 'Campus View',
-                      'price': 'ksh 6,000',
+                      'price': 6000,
                       'img': 'images/kunene/campusview.jpg',
                     },
                     {
                       'title': 'Scholar Corners',
-                      'price': 'ksh 5,500',
+                      'price': 5500,
                       'img': 'images/kunene/scholarcorners.jpg',
                     },
                     {
                       'title': 'NextDoor Residences',
-                      'price': 'ksh 4,000',
+                      'price': 4000,
                       'img': 'images/kunene/nextdoorresidences.jpg',
                     },
                     {
                       'title': 'Student Square',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/kunene/studentsquare.jpg',
                     },
                   ]),
                   _buildAreaRow("Kianjae", [
                     {
                       'title': 'Unity Flats',
-                      'price': 'ksh 4,500',
+                      'price': 4500,
                       'img': 'images/kianjae/unityflats.jpg',
                     },
                     {
                       'title': 'Vibing Villa',
-                      'price': 'ksh 6,000',
+                      'price': 6000,
                       'img': 'images/kianjae/vibingvilla.jpg',
                     },
                     {
                       'title': 'Cornerstone Ridge',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/kianjae/cornerstoneridge.jpg',
                     },
                     {
                       'title': 'Study Yard Residences',
-                      'price': 'ksh 7,000',
+                      'price': 7000,
                       'img': 'images/kianjae/studyyardresidences.jpg',
                     },
                     {
                       'title': 'Campus Green',
-                      'price': 'ksh 5,000',
+                      'price': 5000,
                       'img': 'images/kianjae/campusgreen.jpg',
                     },
                   ]),
                   _buildAreaRow("Kaithe", [
                     {
                       'title': 'Tajiri Residences',
-                      'price': 'ksh 6,500',
+                      'price': 6500,
                       'img': 'images/kaithe/tajiriresidences.jpg',
                     },
                     {
                       'title': 'Kaithe Studios',
-                      'price': 'ksh 4,000',
+                      'price': 4000,
                       'img': 'images/kaithe/studios.jpg',
                     },
                     {
                       'title': 'Fancy Flats',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/kaithe/fancyflats.jpg',
                     },
                     {
                       'title': 'Student Hub',
-                      'price': 'ksh 3,000',
+                      'price': 3000,
                       'img': 'images/kaithe/studenthub.jpg',
                     },
                     {
                       'title': 'Youth Villa',
-                      'price': 'ksh 7,000',
+                      'price': 7000,
                       'img': 'images/kaithe/youthvilla.jpg',
                     },
                   ]),
                 ]),
+              ),
+            ] else if (_selectedIndex == 2) ...[
+              // ROOMMATES TAB CONTENT
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.people_outline,
+                        size: 80,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Need someone to share a room with?",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Connect with other students looking for housing.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pinkAccent,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Redirect straight to Signup
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StudentsignupPage(
+                                onAuthSuccess: () {
+                                  setState(() => isLoggedIn = true);
+                                  // After signup, you can redirect them back or to a specific roommate list
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Find a Roommate",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ] else ...[
               const SliverFillRemaining(
