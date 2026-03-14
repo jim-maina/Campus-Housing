@@ -290,7 +290,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                               builder: (context) => StudentsignupPage(
                                 onAuthSuccess: () {
                                   setState(() => isLoggedIn = true);
-                                  // After signup, you can redirect them back or to a specific roommate list
+
                                   Navigator.pop(context);
                                 },
                               ),
@@ -308,7 +308,12 @@ class _ListingsFeedState extends State<ListingsFeed> {
               ),
             ] else ...[
               const SliverFillRemaining(
-                child: Center(child: Text("No activities posted yet.")),
+                child: Center(
+                  child: Text(
+                    "Activities coming soon!",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ],
             const SliverToBoxAdapter(child: SizedBox(height: 100)),

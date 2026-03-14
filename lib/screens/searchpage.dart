@@ -1,3 +1,4 @@
+import 'package:campus_housing/screens/listingdetail.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -196,13 +197,11 @@ class _SearchPageState extends State<SearchPage> {
   List<Map<String, dynamic>> _getProcessedList(String query) {
     if (query.trim().isEmpty) return [];
 
-    // 2. FILTERING: Use .trim() to avoid issues with accidental spaces
     List<Map<String, dynamic>> results = allHouses.where((house) {
       final location = house['location'].toString().toLowerCase();
       return location.contains(query.trim().toLowerCase());
     }).toList();
 
-    // 3. THE MAGIC SORT: This forces the comparison to be numerical
     results.sort((a, b) {
       int priceA = a['price'] is int
           ? a['price']
@@ -249,6 +248,13 @@ class _SearchPageState extends State<SearchPage> {
                     itemBuilder: (context, index) {
                       final house = filteredList[index];
                       return ListTile(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ListingDetailPage(houseData: house),
+                          ),
+                        ),
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.asset(

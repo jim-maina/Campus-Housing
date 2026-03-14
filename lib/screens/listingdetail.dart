@@ -73,9 +73,7 @@ class ListingDetailPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          onPressed: () {
-            // Future: Open WhatsApp or Phone Dialer
-          },
+          onPressed: () {},
           child: const Text(
             "Contact Landlord",
             style: TextStyle(color: Colors.white, fontSize: 16),
