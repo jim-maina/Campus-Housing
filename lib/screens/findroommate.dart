@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class AddListingPage extends StatefulWidget {
-  const AddListingPage({super.key});
+class Findroommate extends StatefulWidget {
+  const Findroommate({super.key});
 
   @override
-  State<AddListingPage> createState() => _AddListingPageState();
+  State<Findroommate> createState() => _FindroommateState();
 }
 
-class _AddListingPageState extends State<AddListingPage> {
+class _FindroommateState extends State<Findroommate> {
   String selectedAsset = 'images/nchiru/villahouse.jpg';
   String? selectedArea;
 

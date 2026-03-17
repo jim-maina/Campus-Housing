@@ -1,3 +1,4 @@
+import 'package:campus_housing/screens/findroommate.dart';
 import 'package:flutter/material.dart';
 import 'landlordsignup.dart';
 import 'addlisting.dart';
@@ -79,6 +80,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
             if (_selectedIndex == 0) ...[
               SliverList(
                 delegate: SliverChildListDelegate([
+                  const Divider(height: 40),
                   _buildAreaRow("Nchiru", [
                     {
                       'title': 'Blue House',
@@ -257,6 +259,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                         color: Colors.grey,
                       ),
                       const SizedBox(height: 20),
+
                       const Text(
                         "Need someone to share a room with?",
                         style: TextStyle(
@@ -283,19 +286,32 @@ class _ListingsFeedState extends State<ListingsFeed> {
                           ),
                         ),
                         onPressed: () {
-                          // Redirect straight to Signup
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => StudentsignupPage(
-                                onAuthSuccess: () {
-                                  setState(() => isLoggedIn = true);
-
-                                  Navigator.pop(context);
-                                },
+                          if (isLoggedIn) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Findroommate(),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StudentsignupPage(
+                                  onAuthSuccess: () {
+                                    setState(() => isLoggedIn = true);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Findroommate(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: const Text(
                           "Find a Roommate",
@@ -413,7 +429,11 @@ class _ListingsFeedState extends State<ListingsFeed> {
               if (index == houses.length) {
                 return _buildSeeMoreCard(areaName);
               }
-              return _buildHouseCard(houses[index]);
+              final houseWithLocation = {
+                ...houses[index],
+                'location': areaName,
+              };
+              return _buildHouseCard(houseWithLocation);
             },
           ),
         ),
