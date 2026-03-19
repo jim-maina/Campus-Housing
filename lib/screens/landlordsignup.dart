@@ -13,6 +13,7 @@ class _SignupPageState extends State<LandlordSignupPage> {
   bool _isLogin = false;
 
   @override
+  // This method builds the UI of the LandlordSignupPage
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

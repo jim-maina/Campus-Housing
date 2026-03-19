@@ -13,6 +13,7 @@ class _StudentsignupPageState extends State<StudentsignupPage> {
   bool _isLogin = false;
 
   @override
+  // This method builds the UI of the StudentsignupPage
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

@@ -1,10 +1,12 @@
 import 'package:campus_housing/screens/findroommate.dart';
+import 'package:campus_housing/screens/mylisting.dart';
 import 'package:flutter/material.dart';
 import 'landlordsignup.dart';
 import 'addlisting.dart';
 import 'searchpage.dart';
 import 'listingdetail.dart';
 import 'studentsignup.dart';
+import 'models/appdata.dart';
 
 class ListingsFeed extends StatefulWidget {
   const ListingsFeed({Key? key}) : super(key: key);
@@ -19,15 +21,17 @@ class _ListingsFeedState extends State<ListingsFeed> {
 
   @override
   Widget build(BuildContext context) {
+    final Listings = [...AppData.listings, ...AppData.userListings];
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
+        onPressed: () async {
           if (isLoggedIn) {
-            Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AddListingPage()),
             );
+            setState(() {});
           } else {
             Navigator.push(
               context,
@@ -57,6 +61,31 @@ class _ListingsFeedState extends State<ListingsFeed> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              floating: true, // App bar reappears when you scroll up
+              elevation: 0,
+              title: const Text(
+                "Campus Housing",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.person_outline, color: Colors.black),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyListingsPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
             SliverToBoxAdapter(child: _buildSearchBar(context)),
             SliverToBoxAdapter(
               child: Padding(
@@ -76,173 +105,94 @@ class _ListingsFeedState extends State<ListingsFeed> {
                 ),
               ),
             ),
-
+            // HOMES TAB CONTENT
             if (_selectedIndex == 0) ...[
               SliverList(
                 delegate: SliverChildListDelegate([
                   const Divider(height: 40),
-                  _buildAreaRow("Nchiru", [
-                    {
-                      'title': 'Blue House',
-                      'price': 3500,
-                      'img': 'images/nchiru/bluehouse.jpg',
-                    },
-                    {
-                      'title': 'Green House',
-                      'price': 3000,
-                      'img': 'images/nchiru/greenhouse.jpg',
-                    },
-                    {
-                      'title': 'Orange House',
-                      'price': 4000,
-                      'img': 'images/nchiru/orangehouse.jpg',
-                    },
-                    {
-                      'title': 'Villa House',
-                      'price': 5000,
-                      'img': 'images/nchiru/villahouse.jpg',
-                    },
-                    {
-                      'title': 'Pink House',
-                      'price': 6000,
-                      'img': 'images/nchiru/pinkhouse.jpg',
-                    },
-                  ]),
-                  _buildAreaRow("Mascan", [
-                    {
-                      'title': 'Mascan Studios',
-                      'price': 4500,
-                      'img': 'images/mascan/mascan.jpg',
-                    },
-                    {
-                      'title': 'Studio House',
-                      'price': 5000,
-                      'img': 'images/mascan/studiohouse.jpg',
-                    },
-                    {
-                      'title': 'Cozy House',
-                      'price': 6000,
-                      'img': 'images/mascan/cozyhouse.jpg',
-                    },
-                    {
-                      'title': 'Fun Villa',
-                      'price': 5000,
-                      'img': 'images/mascan/funvilla.jpg',
-                    },
-                    {
-                      'title': 'Campus Villa',
-                      'price': 4000,
-                      'img': 'images/mascan/campusvilla.jpg',
-                    },
-                  ]),
-                  _buildAreaRow("Alaban", [
-                    {
-                      'title': 'Unity Gardens',
-                      'price': 4500,
-                      'img': 'images/alaban/unitygardens.jpg',
-                    },
-                    {
-                      'title': 'Freedom House',
-                      'price': 3000,
-                      'img': 'images/alaban/freedomhouse.jpg',
-                    },
-                    {
-                      'title': 'Ubuntu House',
-                      'price': 5000,
-                      'img': 'images/alaban/ubuntuhouse.jpg',
-                    },
-                    {
-                      'title': 'Sunset Villa',
-                      'price': 4000,
-                      'img': 'images/alaban/sunsetvilla.jpg',
-                    },
-                    {
-                      'title': 'Commonwealth House',
-                      'price': 7000,
-                      'img': 'images/alaban/commonwealthhouse.jpg',
-                    },
-                  ]),
-                  _buildAreaRow("Kunene", [
-                    {
-                      'title': 'Qwetu Residences',
-                      'price': 4500,
-                      'img': 'images/kunene/qweturesidences.jpg',
-                    },
-                    {
-                      'title': 'Campus View',
-                      'price': 6000,
-                      'img': 'images/kunene/campusview.jpg',
-                    },
-                    {
-                      'title': 'Scholar Corners',
-                      'price': 5500,
-                      'img': 'images/kunene/scholarcorners.jpg',
-                    },
-                    {
-                      'title': 'NextDoor Residences',
-                      'price': 4000,
-                      'img': 'images/kunene/nextdoorresidences.jpg',
-                    },
-                    {
-                      'title': 'Student Square',
-                      'price': 3000,
-                      'img': 'images/kunene/studentsquare.jpg',
-                    },
-                  ]),
-                  _buildAreaRow("Kianjae", [
-                    {
-                      'title': 'Unity Flats',
-                      'price': 4500,
-                      'img': 'images/kianjae/unityflats.jpg',
-                    },
-                    {
-                      'title': 'Vibing Villa',
-                      'price': 6000,
-                      'img': 'images/kianjae/vibingvilla.jpg',
-                    },
-                    {
-                      'title': 'Cornerstone Ridge',
-                      'price': 3000,
-                      'img': 'images/kianjae/cornerstoneridge.jpg',
-                    },
-                    {
-                      'title': 'Study Yard Residences',
-                      'price': 7000,
-                      'img': 'images/kianjae/studyyardresidences.jpg',
-                    },
-                    {
-                      'title': 'Campus Green',
-                      'price': 5000,
-                      'img': 'images/kianjae/campusgreen.jpg',
-                    },
-                  ]),
-                  _buildAreaRow("Kaithe", [
-                    {
-                      'title': 'Tajiri Residences',
-                      'price': 6500,
-                      'img': 'images/kaithe/tajiriresidences.jpg',
-                    },
-                    {
-                      'title': 'Kaithe Studios',
-                      'price': 4000,
-                      'img': 'images/kaithe/studios.jpg',
-                    },
-                    {
-                      'title': 'Fancy Flats',
-                      'price': 3000,
-                      'img': 'images/kaithe/fancyflats.jpg',
-                    },
-                    {
-                      'title': 'Student Hub',
-                      'price': 3000,
-                      'img': 'images/kaithe/studenthub.jpg',
-                    },
-                    {
-                      'title': 'Youth Villa',
-                      'price': 7000,
-                      'img': 'images/kaithe/youthvilla.jpg',
-                    },
-                  ]),
+                  _buildAreaRow(
+                    "Nchiru",
+                    Listings.where((l) => l.location == "Nchiru")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                            'amenities': l.amenities,
+                          },
+                        )
+                        .toList(),
+                  ),
+                  _buildAreaRow(
+                    "Mascan",
+                    Listings.where((l) => l.location == "Mascan")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                            'amenities': l.amenities,
+                          },
+                        )
+                        .toList(),
+                  ),
+                  _buildAreaRow(
+                    "Alaban",
+                    Listings.where((l) => l.location == "Alaban")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                          },
+                        )
+                        .toList(),
+                  ),
+                  _buildAreaRow(
+                    "Kunene",
+                    Listings.where((l) => l.location == "Kunene")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                            'amenities': l.amenities,
+                          },
+                        )
+                        .toList(),
+                  ),
+                  _buildAreaRow(
+                    "Kianjae",
+                    Listings.where((l) => l.location == "Kianjae")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                            'amenities': l.amenities,
+                          },
+                        )
+                        .toList(),
+                  ),
+                  _buildAreaRow(
+                    "Kaithe",
+                    Listings.where((l) => l.location == "Kaithe")
+                        .map(
+                          (l) => {
+                            'title': l.title,
+                            'price': l.price,
+                            'img': l.image,
+                            'description': l.description,
+                            'amenities': l.amenities,
+                          },
+                        )
+                        .toList(),
+                  ),
                 ]),
               ),
             ] else if (_selectedIndex == 2) ...[
@@ -322,6 +272,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                   ),
                 ),
               ),
+              // ACTIVITIES TAB CONTENT
             ] else ...[
               const SliverFillRemaining(
                 child: Center(
@@ -339,6 +290,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
     );
   }
 
+  // Helper widgets for better code organization
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -373,6 +325,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
     );
   }
 
+  // Category tab widget for "Homes", "Activities", "Roommates"
   Widget _buildCategoryTab(int index, String label, IconData icon) {
     bool isSelected = _selectedIndex == index;
     return GestureDetector(
@@ -399,6 +352,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
     );
   }
 
+  // Builds a horizontal list of house cards for a specific area, with a "See More" card at the end
   Widget _buildAreaRow(String areaName, List<Map<String, dynamic>> houses) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,7 +369,6 @@ class _ListingsFeedState extends State<ListingsFeed> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.black54),
             ],
           ),
         ),
@@ -441,6 +394,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
     );
   }
 
+  // Builds a card widget for a single house listing, which navigates to the details page when tapped
   Widget _buildHouseCard(Map<String, dynamic> house) {
     return InkWell(
       // Navigate to the details page when tapped
@@ -452,7 +406,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
           ),
         );
       },
-      // Optional: Adds a nice ripple effect that matches the card shape
+      // Card design
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 240,
@@ -498,6 +452,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
     );
   }
 
+  // Builds a card widget that prompts users to see more listings in a specific area, which would navigate to a new page showing all listings for that area
   Widget _buildSeeMoreCard(String areaName) {
     return InkWell(
       onTap: () {

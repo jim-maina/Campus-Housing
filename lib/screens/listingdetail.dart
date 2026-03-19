@@ -11,7 +11,6 @@ class ListingDetailPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
-          // 1. THE IMAGE HEADER
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
@@ -23,8 +22,6 @@ class ListingDetailPage extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-
-          // 2. THE CONTENT
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -59,37 +56,56 @@ class ListingDetailPage extends StatelessWidget {
                         size: 16,
                         color: Colors.grey,
                       ),
+                      const SizedBox(width: 4),
                       Text(
                         houseData['location'],
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
-
                   const Divider(height: 40),
 
                   const Text(
                     "Description",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "This is a beautiful property located in a serene environment, perfect for students. It features modern finishing and is close to the university gate.",
-                    style: TextStyle(color: Colors.grey, height: 1.5),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    houseData['description'] ??
+                        "Beautiful campus housing with great views.",
+                    style: const TextStyle(color: Colors.grey, fontSize: 15),
                   ),
 
-                  const SizedBox(height: 30),
-
-                  // 3. AMENITIES DISPLAY
+                  const SizedBox(height: 20),
                   const Text(
                     "Amenities",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  _buildAmenityRow(Icons.wifi, "High-speed WiFi"),
-                  _buildAmenityRow(Icons.water_drop, "24/7 Water Supply"),
-                  _buildAmenityRow(Icons.security, "Security Guard"),
 
+                  Wrap(
+                    spacing: 8,
+                    children:
+                        (houseData['amenities'] as List<dynamic>?)?.map((item) {
+                          return Chip(
+                            label: Text(item.toString()),
+                            backgroundColor: Colors.pinkAccent.withOpacity(
+                              0.05,
+                            ),
+                            side: BorderSide.none,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          );
+                        }).toList() ??
+                        [
+                          const Text(
+                            "Standard amenities included",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                  ),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -97,7 +113,6 @@ class ListingDetailPage extends StatelessWidget {
           ),
         ],
       ),
-      // 4. THE ACTION BUTTON
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         color: Colors.white,
@@ -114,22 +129,13 @@ class ListingDetailPage extends StatelessWidget {
           },
           child: const Text(
             "Contact Landlord",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAmenityRow(IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Colors.pinkAccent),
-          const SizedBox(width: 15),
-          Text(label, style: const TextStyle(fontSize: 16)),
-        ],
       ),
     );
   }

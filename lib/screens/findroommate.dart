@@ -21,7 +21,7 @@ class _FindroommateState extends State<Findroommate> {
     "Hot Shower",
   ];
 
-  // List of all your asset images for the "Gallery Picker"
+  // Inside your State class
   final List<String> availableAssets = [
     'images/nchiru/bluehouse.jpg',
     'images/nchiru/greenhouse.jpg',
@@ -61,6 +61,7 @@ class _FindroommateState extends State<Findroommate> {
   ];
 
   @override
+  // This method builds the UI of the Findroommate page
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

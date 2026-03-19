@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/appdata.dart';
 
 class AddListingPage extends StatefulWidget {
   const AddListingPage({super.key});
@@ -8,20 +9,14 @@ class AddListingPage extends StatefulWidget {
 }
 
 class _AddListingPageState extends State<AddListingPage> {
+  final _nameController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _descController = TextEditingController();
+
   String selectedAsset = 'images/nchiru/villahouse.jpg';
   String? selectedArea;
-
-  // Inside your State class
   List<String> selectedAmenities = [];
 
-  final List<String> amenitiesList = [
-    "WiFi",
-    "Water",
-    "Security",
-    "Hot Shower",
-  ];
-
-  // List of all your asset images for the "Gallery Picker"
   final List<String> availableAssets = [
     'images/nchiru/bluehouse.jpg',
     'images/nchiru/greenhouse.jpg',
@@ -60,6 +55,35 @@ class _AddListingPageState extends State<AddListingPage> {
     'images/kaithe/youthvilla.jpg',
   ];
 
+  void _publishListing() {
+    if (_nameController.text.isEmpty ||
+        _priceController.text.isEmpty ||
+        selectedArea == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in the Name, Price, and Location"),
+        ),
+      );
+      return;
+    }
+
+    final newListing = Listing(
+      title: _nameController.text,
+      price: _priceController.text,
+      location: selectedArea!,
+      image: selectedAsset,
+      description: _descController.text,
+      amenities: List.from(selectedAmenities),
+    );
+
+    // Add to our central list
+    setState(() {
+      AppData.userListings.add(newListing);
+    });
+
+    _showSuccessDialog(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +101,7 @@ class _AddListingPageState extends State<AddListingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // IMAGE PREVIEW SECTION
+            // IMAGE PREVIEW
             Container(
               height: 250,
               width: double.infinity,
@@ -91,7 +115,7 @@ class _AddListingPageState extends State<AddListingPage> {
               ),
             ),
 
-            // ASSET GALLERY PICKER (The "Upload" alternative)
+            // ASSET GALLERY PICKER
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -100,37 +124,7 @@ class _AddListingPageState extends State<AddListingPage> {
               ),
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              height: 80,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: availableAssets.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () =>
-                        setState(() => selectedAsset = availableAssets[index]),
-                    child: Container(
-                      width: 80,
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: selectedAsset == availableAssets[index]
-                              ? Colors.pinkAccent
-                              : Colors.transparent,
-                          width: 3,
-                        ),
-                        image: DecorationImage(
-                          image: AssetImage(availableAssets[index]),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            _buildGalleryPicker(),
 
             const SizedBox(height: 25),
 
@@ -139,10 +133,13 @@ class _AddListingPageState extends State<AddListingPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  _buildInput("Hostel/Villa Name", Icons.business),
+                  _buildInput(
+                    "Hostel/Villa Name",
+                    Icons.business,
+                    controller: _nameController,
+                  ),
                   const SizedBox(height: 15),
 
-                  // AREA DROPDOWN
                   DropdownButtonFormField<String>(
                     decoration: _inputDecoration("Location", Icons.location_on),
                     items:
@@ -169,11 +166,23 @@ class _AddListingPageState extends State<AddListingPage> {
                     "Monthly Rent (Ksh)",
                     Icons.monetization_on,
                     isNumber: true,
+                    controller: _priceController,
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // DESCRIPTION FIELD
+                  TextField(
+                    controller: _descController,
+                    maxLines: 4,
+                    decoration: _inputDecoration(
+                      "Description",
+                      Icons.description,
+                    ).copyWith(alignLabelWithHint: true),
                   ),
 
                   const SizedBox(height: 25),
 
-                  // AMENITIES SECTION
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -185,11 +194,11 @@ class _AddListingPageState extends State<AddListingPage> {
                   Wrap(
                     spacing: 8,
                     children: [
-                      _amenityChip("WiFi"),
-                      _amenityChip("Water"),
-                      _amenityChip("Security"),
-                      _amenityChip("Hot Shower"),
-                    ],
+                      "WiFi",
+                      "Water",
+                      "Security",
+                      "Hot Shower",
+                    ].map((a) => _amenityChip(a)).toList(),
                   ),
 
                   const SizedBox(height: 40),
@@ -205,10 +214,7 @@ class _AddListingPageState extends State<AddListingPage> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed: () {
-                        // Show a success dialog for the presentation
-                        _showSuccessDialog(context);
-                      },
+                      onPressed: _publishListing, // Calls our new logic
                       child: const Text(
                         "Publish Listing",
                         style: TextStyle(color: Colors.white, fontSize: 16),
@@ -225,7 +231,19 @@ class _AddListingPageState extends State<AddListingPage> {
     );
   }
 
-  // Helper UI methods
+  Widget _buildInput(
+    String label,
+    IconData icon, {
+    bool isNumber = false,
+    TextEditingController? controller,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      decoration: _inputDecoration(label, icon),
+    );
+  }
+
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
@@ -239,51 +257,60 @@ class _AddListingPageState extends State<AddListingPage> {
     );
   }
 
-  Widget _buildInput(String label, IconData icon, {bool isNumber = false}) {
-    return TextField(
-      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      decoration: _inputDecoration(label, icon),
+  Widget _buildGalleryPicker() {
+    return SizedBox(
+      height: 80,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: availableAssets.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () => setState(() => selectedAsset = availableAssets[index]),
+            child: Container(
+              width: 80,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: selectedAsset == availableAssets[index]
+                      ? Colors.pinkAccent
+                      : Colors.transparent,
+                  width: 3,
+                ),
+                image: DecorationImage(
+                  image: AssetImage(availableAssets[index]),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _amenityChip(String label) {
-    // Check if this specific chip is selected
     bool isSelected = selectedAmenities.contains(label);
-
     return FilterChip(
       label: Text(label),
       selected: isSelected,
-      selectedColor: Colors.pinkAccent.withOpacity(
-        0.2,
-      ), // Light pink background
-      checkmarkColor: Colors.pinkAccent, // The checkmark color
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.pinkAccent : Colors.black,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected ? Colors.pinkAccent : Colors.grey[300]!,
-        ),
-      ),
       onSelected: (bool value) {
         setState(() {
-          if (value) {
-            // Add to list if selected
-            selectedAmenities.add(label);
-          } else {
-            // Remove from list if unselected
-            selectedAmenities.remove(label);
-          }
+          value
+              ? selectedAmenities.add(label)
+              : selectedAmenities.remove(label);
         });
       },
+      selectedColor: Colors.pinkAccent.withOpacity(0.2),
+      checkmarkColor: Colors.pinkAccent,
     );
   }
 
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Icon(Icons.check_circle, color: Colors.green, size: 60),
         content: const Text(
@@ -292,8 +319,11 @@ class _AddListingPageState extends State<AddListingPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Go back to Feed
+            },
+            child: const Text("Awesome!"),
           ),
         ],
       ),
