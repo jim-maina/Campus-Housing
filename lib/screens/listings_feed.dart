@@ -31,7 +31,9 @@ class _ListingsFeedState extends State<ListingsFeed> {
               context,
               MaterialPageRoute(builder: (context) => const AddListingPage()),
             );
-            setState(() {});
+            setState(
+              () => {},
+            ); // Refresh the feed after returning from AddListingPage
           } else {
             Navigator.push(
               context,
