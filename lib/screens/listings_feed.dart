@@ -198,82 +198,111 @@ class _ListingsFeedState extends State<ListingsFeed> {
                 ]),
               ),
             ] else if (_selectedIndex == 2) ...[
-              // ROOMMATES TAB CONTENT
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
+              // 1. THE TOP "CALL TO ACTION" (Always stays at the top of the scroll)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
                         Icons.people_outline,
-                        size: 80,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Text(
-                        "Need someone to share a room with?",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        size: 60,
+                        color: Colors.pinkAccent,
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "Connect with other students looking for housing.",
-                        textAlign: TextAlign.center,
+                        "Roommate Finder",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        "Connect with students looking for housing.",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pinkAccent,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 15,
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.pinkAccent,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (isLoggedIn) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Findroommate(),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => StudentsignupPage(
-                                  onAuthSuccess: () {
-                                    setState(() => isLoggedIn = true);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Findroommate(),
-                                      ),
-                                    );
-                                  },
+                          onPressed: () {
+                            if (isLoggedIn) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Findroommate(),
                                 ),
-                              ),
-                            );
-                          }
-                        },
-                        child: const Text(
-                          "Find a Roommate",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StudentsignupPage(
+                                    onAuthSuccess: () {
+                                      setState(() => isLoggedIn = true);
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Findroommate(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            "Post My Profile",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
+                      const Divider(height: 40),
                     ],
                   ),
                 ),
               ),
+              if (AppData.userRoommates.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 50.0),
+                    child: const Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.person_search_outlined,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "No profiles yet. Be the first to post!",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final person = AppData.userRoommates[index];
+                    return _buildRoommateListItem(person);
+                  }, childCount: AppData.userRoommates.length),
+                ),
               // ACTIVITIES TAB CONTENT
             ] else ...[
               const SliverFillRemaining(
@@ -483,4 +512,57 @@ class _ListingsFeedState extends State<ListingsFeed> {
       ),
     );
   }
+}
+
+Widget _buildRoommateListItem(person) {
+  return InkWell(
+    onTap: () {
+      print("Navigate to all listings for $person");
+    },
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(radius: 30, backgroundImage: AssetImage(person.image)),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  person.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  person.course,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  person.status,
+                  style: TextStyle(
+                    color: person.status == "Has House"
+                        ? Colors.green
+                        : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: Colors.grey),
+        ],
+      ),
+    ),
+  );
 }

@@ -201,5 +201,30 @@ class AppData {
       image: 'images/kaithe/youthvilla.jpg',
     ),
   ];
+
   static List<Listing> userListings = [];
+
+  static List<Roommate> userRoommates = [];
+}
+
+class Roommate {
+  final String name;
+  final String course;
+  final String gender;
+  final String status;
+  final String budget;
+  final String bio;
+  final String image;
+  final List<String> habits;
+
+  Roommate({
+    required this.name,
+    required this.course,
+    required this.gender,
+    required this.status,
+    required this.budget,
+    required this.bio,
+    required this.image,
+    required this.habits,
+  });
 }

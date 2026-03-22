@@ -1,3 +1,4 @@
+import 'package:campus_housing/screens/models/appdata.dart';
 import 'package:flutter/material.dart';
 
 class Findroommate extends StatefulWidget {
@@ -8,11 +9,15 @@ class Findroommate extends StatefulWidget {
 }
 
 class _FindroommateState extends State<Findroommate> {
-  // Using a profile-style placeholder or a generic avatar
+  // 1. ADD CONTROLLERS
+  final _nameController = TextEditingController();
+  final _courseController = TextEditingController();
+  final _budgetController = TextEditingController();
+  final _bioController = TextEditingController();
+
   String selectedAsset = 'images/nchiru/villahouse.jpg';
   String? selectedGender;
   String? lookingStatus;
-
   List<String> selectedHabits = [];
 
   final List<String> habitsList = [
@@ -24,10 +29,42 @@ class _FindroommateState extends State<Findroommate> {
     "Pet Friendly",
   ];
 
+  // 2. UPDATED PUBLISH LOGIC
+  void _publishProfile() {
+    if (_nameController.text.isEmpty ||
+        selectedGender == null ||
+        lookingStatus == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in your Name, Gender, and Status"),
+        ),
+      );
+      return;
+    }
+
+    // Create the new Roommate object
+    final newRoommate = Roommate(
+      name: _nameController.text,
+      course: _courseController.text,
+      gender: selectedGender!,
+      status: lookingStatus!,
+      budget: _budgetController.text,
+      bio: _bioController.text,
+      image: selectedAsset,
+      habits: List.from(selectedHabits),
+    );
+
+    // Add to the ROOMMATE list in roommates.dart
+    setState(() {
+      AppData.userRoommates.add(newRoommate);
+    });
+
+    _showSuccessDialog(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Roommate Profile",
@@ -38,7 +75,6 @@ class _FindroommateState extends State<Findroommate> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // PROFILE IMAGE SECTION
             Center(
@@ -63,15 +99,10 @@ class _FindroommateState extends State<Findroommate> {
                     child: CircleAvatar(
                       backgroundColor: Colors.pinkAccent,
                       radius: 20,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          // Image picker logic
-                        },
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
                   ),
@@ -83,16 +114,19 @@ class _FindroommateState extends State<Findroommate> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  _buildInput("Full Name", Icons.person_outline),
-                  const SizedBox(height: 15),
-
                   _buildInput(
-                    "Course of Study (e.g., Computer Science)",
+                    "Full Name",
+                    Icons.person_outline,
+                    controller: _nameController,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildInput(
+                    "Course of Study",
                     Icons.school_outlined,
+                    controller: _courseController,
                   ),
                   const SizedBox(height: 15),
 
-                  // GENDER & STATUS ROW
                   Row(
                     children: [
                       Expanded(
@@ -133,11 +167,12 @@ class _FindroommateState extends State<Findroommate> {
                     "Budget Range (e.g., 3k - 7k)",
                     Icons.account_balance_wallet_outlined,
                     isNumber: true,
+                    controller: _budgetController,
                   ),
                   const SizedBox(height: 15),
 
-                  // BIO / DESCRIPTION
                   TextField(
+                    controller: _bioController,
                     maxLines: 3,
                     decoration: _inputDecoration(
                       "About Me & Preferences",
@@ -146,8 +181,6 @@ class _FindroommateState extends State<Findroommate> {
                   ),
 
                   const SizedBox(height: 25),
-
-                  // HABITS / TAGS SECTION
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -168,7 +201,6 @@ class _FindroommateState extends State<Findroommate> {
 
                   const SizedBox(height: 40),
 
-                  // PUBLISH BUTTON
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -179,7 +211,7 @@ class _FindroommateState extends State<Findroommate> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed: () => _showSuccessDialog(context),
+                      onPressed: _publishProfile, // Corrected function call
                       child: const Text(
                         "Post My Profile",
                         style: TextStyle(
@@ -200,12 +232,13 @@ class _FindroommateState extends State<Findroommate> {
     );
   }
 
-  // UI Helpers (Updated for dynamic colors)
+  // --- UI HELPERS ---
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
       filled: true,
+      fillColor: Colors.grey[100],
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide.none,
@@ -213,8 +246,14 @@ class _FindroommateState extends State<Findroommate> {
     );
   }
 
-  Widget _buildInput(String label, IconData icon, {bool isNumber = false}) {
+  Widget _buildInput(
+    String label,
+    IconData icon, {
+    bool isNumber = false,
+    TextEditingController? controller,
+  }) {
     return TextField(
+      controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: _inputDecoration(label, icon),
     );
@@ -246,7 +285,10 @@ class _FindroommateState extends State<Findroommate> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Back to Roommate Feed
+            },
             child: const Text("Close"),
           ),
         ],
