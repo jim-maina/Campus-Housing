@@ -1,5 +1,6 @@
 import 'package:campus_housing/screens/findroommate.dart';
 import 'package:campus_housing/screens/mylisting.dart';
+import 'package:campus_housing/screens/profilepage.dart';
 import 'package:flutter/material.dart';
 import 'landlordsignup.dart';
 import 'addlisting.dart';
@@ -300,7 +301,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final person = AppData.userRoommates[index];
-                    return _buildRoommateListItem(person);
+                    return _buildRoommateListItem(person, context);
                   }, childCount: AppData.userRoommates.length),
                 ),
               // ACTIVITIES TAB CONTENT
@@ -385,6 +386,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
 
   // Builds a horizontal list of house cards for a specific area, with a "See More" card at the end
   Widget _buildAreaRow(String areaName, List<Map<String, dynamic>> houses) {
+    if (houses.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -408,11 +410,8 @@ class _ListingsFeedState extends State<ListingsFeed> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 20),
-            itemCount: houses.length + 1, // Add one for the "See More" card
+            itemCount: houses.length, // Add one for the "See More" card
             itemBuilder: (context, index) {
-              if (index == houses.length) {
-                return _buildSeeMoreCard(areaName);
-              }
               final houseWithLocation = {
                 ...houses[index],
                 'location': areaName,
@@ -482,42 +481,15 @@ class _ListingsFeedState extends State<ListingsFeed> {
       ),
     );
   }
-
-  // Builds a card widget that prompts users to see more listings in a specific area, which would navigate to a new page showing all listings for that area
-  Widget _buildSeeMoreCard(String areaName) {
-    return InkWell(
-      onTap: () {
-        // This will navigate to a page showing all listings for this specific area
-        print("Navigate to all listings for $areaName");
-      },
-      child: Container(
-        width: 150,
-        margin: const EdgeInsets.only(right: 20, bottom: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.arrow_circle_right_outlined,
-              size: 40,
-              color: Colors.pinkAccent,
-            ),
-            SizedBox(height: 8),
-            Text("See all", style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-Widget _buildRoommateListItem(person) {
+Widget _buildRoommateListItem(person, context) {
   return InkWell(
     onTap: () {
-      print("Navigate to all listings for $person");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfilePage()),
+      );
     },
     child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
