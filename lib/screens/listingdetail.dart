@@ -11,7 +11,6 @@ Future<void> _callLandlord(String? phone) async {
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
-    // You could show a snackbar here if the dialer won't open
     print("Could not launch dialer");
   }
 }

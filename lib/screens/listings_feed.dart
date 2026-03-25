@@ -417,7 +417,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 20),
-            itemCount: houses.length, // Add one for the "See More" card
+            itemCount: houses.length,
             itemBuilder: (context, index) {
               final houseWithLocation = {
                 ...houses[index],

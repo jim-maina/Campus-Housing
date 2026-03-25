@@ -77,7 +77,6 @@ class _AddListingPageState extends State<AddListingPage> {
       amenities: List.from(selectedAmenities),
     );
 
-    // Add to our central list
     setState(() {
       AppData.userListings.add(newListing);
       Navigator.pop(context);

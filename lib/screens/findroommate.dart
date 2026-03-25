@@ -52,7 +52,6 @@ class _FindroommateState extends State<Findroommate> {
 
       _showSuccessDialog(context);
     } else {
-      // If validation fails, a SnackBar is a nice touch
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fix the errors in red")),
       );
@@ -221,7 +220,7 @@ class _FindroommateState extends State<Findroommate> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        onPressed: _publishProfile, // Corrected function call
+                        onPressed: _publishProfile,
                         child: const Text(
                           "Post My Profile",
                           style: TextStyle(
