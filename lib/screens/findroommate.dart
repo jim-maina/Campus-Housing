@@ -10,7 +10,9 @@ class Findroommate extends StatefulWidget {
 
 class _FindroommateState extends State<Findroommate> {
   // 1. ADD CONTROLLERS
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _courseController = TextEditingController();
   final _budgetController = TextEditingController();
   final _bioController = TextEditingController();
@@ -31,35 +33,30 @@ class _FindroommateState extends State<Findroommate> {
 
   // 2. UPDATED PUBLISH LOGIC
   void _publishProfile() {
-    if (_nameController.text.isEmpty ||
-        selectedGender == null ||
-        lookingStatus == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill in your Name, Gender, and Status"),
-        ),
+    if (_formKey.currentState!.validate()) {
+      final newRoommate = Roommate(
+        name: _nameController.text,
+        phone: _phoneController.text,
+        course: _courseController.text,
+        gender: selectedGender!,
+        status: lookingStatus!,
+        budget: _budgetController.text,
+        bio: _bioController.text,
+        image: selectedAsset,
+        habits: List.from(selectedHabits),
       );
-      return;
+
+      setState(() {
+        AppData.userRoommates.add(newRoommate);
+      });
+
+      _showSuccessDialog(context);
+    } else {
+      // If validation fails, a SnackBar is a nice touch
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fix the errors in red")),
+      );
     }
-
-    // Create the new Roommate object
-    final newRoommate = Roommate(
-      name: _nameController.text,
-      course: _courseController.text,
-      gender: selectedGender!,
-      status: lookingStatus!,
-      budget: _budgetController.text,
-      bio: _bioController.text,
-      image: selectedAsset,
-      habits: List.from(selectedHabits),
-    );
-
-    // Add to the ROOMMATE list in roommates.dart
-    setState(() {
-      AppData.userRoommates.add(newRoommate);
-    });
-
-    _showSuccessDialog(context);
   }
 
   @override
@@ -74,159 +71,173 @@ class _FindroommateState extends State<Findroommate> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // PROFILE IMAGE SECTION
-            Center(
-              child: Stack(
-                children: [
-                  Container(
-                    height: 150,
-                    width: 150,
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.pinkAccent, width: 3),
-                      image: DecorationImage(
-                        image: AssetImage(selectedAsset),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    right: 0,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.pinkAccent,
-                      radius: 20,
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  _buildInput(
-                    "Full Name",
-                    Icons.person_outline,
-                    controller: _nameController,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildInput(
-                    "Course of Study",
-                    Icons.school_outlined,
-                    controller: _courseController,
-                  ),
-                  const SizedBox(height: 15),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          decoration: _inputDecoration("Gender", Icons.face),
-                          items: ["Male", "Female"]
-                              .map(
-                                (g) =>
-                                    DropdownMenuItem(value: g, child: Text(g)),
-                              )
-                              .toList(),
-                          onChanged: (val) =>
-                              setState(() => selectedGender = val),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // PROFILE IMAGE SECTION
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 150,
+                      width: 150,
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.pinkAccent, width: 3),
+                        image: DecorationImage(
+                          image: AssetImage(selectedAsset),
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          decoration: _inputDecoration(
-                            "Status",
-                            Icons.home_outlined,
-                          ),
-                          items: ["Has House", "Searching"]
-                              .map(
-                                (s) =>
-                                    DropdownMenuItem(value: s, child: Text(s)),
-                              )
-                              .toList(),
-                          onChanged: (val) =>
-                              setState(() => lookingStatus = val),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-
-                  _buildInput(
-                    "Budget Range (e.g., 3k - 7k)",
-                    Icons.account_balance_wallet_outlined,
-                    isNumber: true,
-                    controller: _budgetController,
-                  ),
-                  const SizedBox(height: 15),
-
-                  TextField(
-                    controller: _bioController,
-                    maxLines: 3,
-                    decoration: _inputDecoration(
-                      "About Me & Preferences",
-                      Icons.edit_note_outlined,
-                    ).copyWith(alignLabelWithHint: true),
-                  ),
-
-                  const SizedBox(height: 25),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "My Lifestyle / Habits",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: habitsList
-                        .map((habit) => _habitChip(habit))
-                        .toList(),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
+                    Positioned(
+                      bottom: 20,
+                      right: 0,
+                      child: CircleAvatar(
                         backgroundColor: Colors.pinkAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      onPressed: _publishProfile, // Corrected function call
-                      child: const Text(
-                        "Post My Profile",
-                        style: TextStyle(
+                        radius: 20,
+                        child: const Icon(
+                          Icons.camera_alt,
                           color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          size: 20,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    _buildInput(
+                      "Full Name",
+                      Icons.person_outline,
+                      controller: _nameController,
+                    ),
+                    const SizedBox(height: 15),
+                    _buildInput(
+                      "WhatsApp Number (e.g. 0712...)",
+                      Icons.phone_android_outlined,
+                      isNumber: true,
+                      controller: _phoneController,
+                    ),
+                    const SizedBox(height: 15),
+                    _buildInput(
+                      "Course of Study",
+                      Icons.school_outlined,
+                      controller: _courseController,
+                    ),
+                    const SizedBox(height: 15),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            decoration: _inputDecoration("Gender", Icons.face),
+                            items: ["Male", "Female"]
+                                .map(
+                                  (g) => DropdownMenuItem(
+                                    value: g,
+                                    child: Text(g),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (val) =>
+                                setState(() => selectedGender = val),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            decoration: _inputDecoration(
+                              "Status",
+                              Icons.home_outlined,
+                            ),
+                            items: ["Has House", "Searching"]
+                                .map(
+                                  (s) => DropdownMenuItem(
+                                    value: s,
+                                    child: Text(s),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (val) =>
+                                setState(() => lookingStatus = val),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+
+                    _buildInput(
+                      "Budget Range (e.g., 3k - 7k)",
+                      Icons.account_balance_wallet_outlined,
+                      isNumber: true,
+                      controller: _budgetController,
+                    ),
+                    const SizedBox(height: 15),
+
+                    TextField(
+                      controller: _bioController,
+                      maxLines: 3,
+                      decoration: _inputDecoration(
+                        "About Me & Preferences",
+                        Icons.edit_note_outlined,
+                      ).copyWith(alignLabelWithHint: true),
+                    ),
+
+                    const SizedBox(height: 25),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "My Lifestyle / Habits",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      children: habitsList
+                          .map((habit) => _habitChip(habit))
+                          .toList(),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pinkAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        onPressed: _publishProfile, // Corrected function call
+                        child: const Text(
+                          "Post My Profile",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -252,10 +263,30 @@ class _FindroommateState extends State<Findroommate> {
     bool isNumber = false,
     TextEditingController? controller,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: _inputDecoration(label, icon),
+
+      validator: (value) {
+        if (isNumber && label.contains("Number")) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your phone number';
+          }
+
+          if (value.length != 10) {
+            return 'Number must be exactly 10 digits';
+          }
+
+          if (!value.startsWith('0')) {
+            return 'Should start with 0 (e.g., 07...)';
+          }
+        }
+        if (value == null || value.isEmpty) {
+          return 'This field cannot be empty';
+        }
+        return null;
+      },
     );
   }
 

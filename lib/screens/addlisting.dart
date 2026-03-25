@@ -73,12 +73,14 @@ class _AddListingPageState extends State<AddListingPage> {
       location: selectedArea!,
       image: selectedAsset,
       description: _descController.text,
+      phone: AppData.loggedInLandlordPhone ?? "0700000000",
       amenities: List.from(selectedAmenities),
     );
 
     // Add to our central list
     setState(() {
       AppData.userListings.add(newListing);
+      Navigator.pop(context);
     });
 
     _showSuccessDialog(context);

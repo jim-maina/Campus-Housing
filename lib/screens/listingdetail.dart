@@ -1,4 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+Future<void> _callLandlord(String? phone) async {
+  if (phone == null || phone.isEmpty) {
+    // Handle cases where no phone is provided
+    return;
+  }
+
+  final Uri url = Uri.parse("tel:$phone");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    // You could show a snackbar here if the dialer won't open
+    print("Could not launch dialer");
+  }
+}
 
 class ListingDetailPage extends StatelessWidget {
   final Map<String, dynamic> houseData;
@@ -124,9 +140,10 @@ class ListingDetailPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          onPressed: () {
-            // Logic to call the landlord
-          },
+          onPressed:
+              ()
+              // Logic to call the landlord
+              => _callLandlord(houseData['phone']),
           child: const Text(
             "Contact Landlord",
             style: TextStyle(

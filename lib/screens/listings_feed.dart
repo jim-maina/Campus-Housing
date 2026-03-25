@@ -122,6 +122,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
                             'amenities': l.amenities,
                           },
                         )
@@ -136,6 +137,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
                             'amenities': l.amenities,
                           },
                         )
@@ -150,6 +152,8 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
+                            'amenities': l.amenities,
                           },
                         )
                         .toList(),
@@ -163,6 +167,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
                             'amenities': l.amenities,
                           },
                         )
@@ -177,6 +182,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
                             'amenities': l.amenities,
                           },
                         )
@@ -191,6 +197,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'price': l.price,
                             'img': l.image,
                             'description': l.description,
+                            'phone': l.phone,
                             'amenities': l.amenities,
                           },
                         )
@@ -488,7 +495,7 @@ Widget _buildRoommateListItem(person, context) {
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ProfilePage()),
+        MaterialPageRoute(builder: (context) => Profilepage(person: person)),
       );
     },
     child: Container(
