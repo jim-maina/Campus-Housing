@@ -79,7 +79,6 @@ class _AddListingPageState extends State<AddListingPage> {
 
     setState(() {
       AppData.userListings.add(newListing);
-      Navigator.pop(context);
     });
 
     _showSuccessDialog(context);

@@ -1,4 +1,5 @@
 //This is the signup page for students.
+import 'package:campus_housing/screens/models/appdata.dart';
 import 'package:flutter/material.dart';
 
 class StudentsignupPage extends StatefulWidget {
@@ -11,6 +12,18 @@ class StudentsignupPage extends StatefulWidget {
 
 class _StudentsignupPageState extends State<StudentsignupPage> {
   bool _isLogin = false;
+  // These are the controllers for the text fields
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  // This method disposes of the controllers
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   // This method builds the UI of the StudentsignupPage
@@ -85,6 +98,7 @@ class _StudentsignupPageState extends State<StudentsignupPage> {
                   ),
                 ),
                 onPressed: () {
+                  AppData.loggedInLandlordPhone = _phoneController.text;
                   Future.microtask(() => widget.onAuthSuccess());
                 },
                 child: Text(

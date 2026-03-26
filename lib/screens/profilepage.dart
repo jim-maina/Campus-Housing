@@ -167,9 +167,7 @@ class Profilepage extends StatelessWidget {
             // CALL BUTTON
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => _makeCall(
-                  "0712345678",
-                ), // Replace with the roommate's phone number
+                onPressed: () => _makeCall(person.phone),
                 icon: const Icon(Icons.call, color: Colors.pinkAccent),
                 label: const Text("Call"),
                 style: OutlinedButton.styleFrom(
@@ -184,13 +182,12 @@ class Profilepage extends StatelessWidget {
             const SizedBox(width: 10),
             // WHATSAPP BUTTON
             Expanded(
-              flex: 2, // Makes the WhatsApp button wider
               child: ElevatedButton.icon(
-                onPressed: () => _launchWhatsApp("254712345678", person.name),
-                icon: const Icon(Icons.message, color: Colors.white),
+                onPressed: () => _launchWhatsApp(person.phone, person.name),
+                icon: const Icon(Icons.message, color: Colors.green),
                 label: const Text("WhatsApp"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.pinkAccent),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),

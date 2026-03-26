@@ -139,10 +139,16 @@ class ListingDetailPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          onPressed:
-              ()
-              // Logic to call the landlord
-              => _callLandlord(houseData['phone']),
+          onPressed: () {
+            final phoneNumber = houseData['phone']; // Get the real number
+            if (phoneNumber != null && phoneNumber.isNotEmpty) {
+              _callLandlord(phoneNumber);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Landlord contact not available")),
+              );
+            }
+          },
           child: const Text(
             "Contact Landlord",
             style: TextStyle(
