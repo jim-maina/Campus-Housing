@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Future<void> _callLandlord(String? phone) async {
-  if (phone == null || phone.isEmpty) {
-    // Handle cases where no phone is provided
-    return;
-  }
-
-  final Uri url = Uri.parse("tel:$phone");
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
+Future<void> _callLandlord(String phone) async {
+  final url = "tel:$phone";
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url));
   } else {
-    print("Could not launch dialer");
+    throw 'Could not launch dialer';
   }
 }
 
@@ -139,16 +134,7 @@ class ListingDetailPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          onPressed: () {
-            final phoneNumber = houseData['phone']; // Get the real number
-            if (phoneNumber != null && phoneNumber.isNotEmpty) {
-              _callLandlord(phoneNumber);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Landlord contact not available")),
-              );
-            }
-          },
+          onPressed: () => _callLandlord(houseData['phone']),
           child: const Text(
             "Contact Landlord",
             style: TextStyle(

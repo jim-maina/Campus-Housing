@@ -1,5 +1,4 @@
 //This is the signup page for landlords. It allows them to create an account using their phone number and full name. The phone number will be used for students to contact them about their listings.
-import 'package:campus_housing/screens/models/appdata.dart';
 import 'package:flutter/material.dart';
 
 class LandlordSignupPage extends StatefulWidget {
@@ -14,13 +13,11 @@ class _SignupPageState extends State<LandlordSignupPage> {
   bool _isLogin = false;
   // This is the controllers for the text fields
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   // This method disposes of the controllers
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -64,16 +61,6 @@ class _SignupPageState extends State<LandlordSignupPage> {
               const SizedBox(height: 20),
             ],
 
-            // PHONE NUMBER FIELD
-            const TextField(
-              keyboardType: TextInputType.phone, // Opens numeric keypad
-              decoration: InputDecoration(
-                labelText: "Phone Number",
-                hintText: "07... or 01...",
-                prefixIcon: Icon(Icons.phone_android_outlined),
-                border: OutlineInputBorder(),
-              ),
-            ),
             const SizedBox(height: 20),
 
             const TextField(
@@ -98,7 +85,6 @@ class _SignupPageState extends State<LandlordSignupPage> {
                   ),
                 ),
                 onPressed: () {
-                  AppData.loggedInLandlordPhone = _phoneController.text;
                   Future.microtask(() => widget.onAuthSuccess());
                 },
                 child: Text(

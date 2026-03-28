@@ -9,9 +9,11 @@ class AddListingPage extends StatefulWidget {
 }
 
 class _AddListingPageState extends State<AddListingPage> {
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _descController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   String selectedAsset = 'images/nchiru/villahouse.jpg';
   String? selectedArea;
@@ -56,16 +58,7 @@ class _AddListingPageState extends State<AddListingPage> {
   ];
 
   void _publishListing() {
-    if (_nameController.text.isEmpty ||
-        _priceController.text.isEmpty ||
-        selectedArea == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill in the Name, Price, and Location"),
-        ),
-      );
-      return;
-    }
+    if (_formKey.currentState!.validate()) {}
 
     final newListing = Listing(
       title: _nameController.text,
@@ -73,7 +66,7 @@ class _AddListingPageState extends State<AddListingPage> {
       location: selectedArea!,
       image: selectedAsset,
       description: _descController.text,
-      phone: AppData.loggedInLandlordPhone ?? "0700000000",
+      phone: _phoneController.text,
       amenities: List.from(selectedAmenities),
     );
 
@@ -182,6 +175,14 @@ class _AddListingPageState extends State<AddListingPage> {
                   ),
 
                   const SizedBox(height: 25),
+
+                  _buildInput(
+                    "Phone Number (e.g. 0712...)",
+                    Icons.phone_android_outlined,
+                    isNumber: true,
+                    controller: _phoneController,
+                  ),
+                  const SizedBox(height: 40),
 
                   const Align(
                     alignment: Alignment.centerLeft,

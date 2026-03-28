@@ -31,7 +31,6 @@ class _FindroommateState extends State<Findroommate> {
     "Pet Friendly",
   ];
 
-  // 2. UPDATED PUBLISH LOGIC
   void _publishProfile() {
     if (_formKey.currentState!.validate()) {
       final newRoommate = Roommate(
@@ -119,7 +118,7 @@ class _FindroommateState extends State<Findroommate> {
                     ),
                     const SizedBox(height: 15),
                     _buildInput(
-                      "WhatsApp Number (e.g. 0712...)",
+                      "Phone Number (e.g. 0712...)",
                       Icons.phone_android_outlined,
                       isNumber: true,
                       controller: _phoneController,

@@ -18,12 +18,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple, // This is the main color
+          seedColor: Colors.purple,
           surface: Colors.white,
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      // CHANGE THIS LINE:
       home: const ListingsFeed(),
     );
   }
