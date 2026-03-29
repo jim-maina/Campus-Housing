@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'models/appdata.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class AddListingPage extends StatefulWidget {
   const AddListingPage({super.key});
@@ -9,7 +11,23 @@ class AddListingPage extends StatefulWidget {
 }
 
 class _AddListingPageState extends State<AddListingPage> {
-  final _formKey = GlobalKey<FormState>();
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickHouseImage() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
+    if (pickedFile != null) {
+      if (!mounted) return;
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _descController = TextEditingController();
@@ -58,13 +76,19 @@ class _AddListingPageState extends State<AddListingPage> {
   ];
 
   void _publishListing() {
-    if (_formKey.currentState!.validate()) {}
+    if (selectedArea == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a Location/Area")),
+      );
+      return;
+    }
 
     final newListing = Listing(
+      image: _selectedImage != null ? _selectedImage!.path : selectedAsset,
+      isFromFile: _selectedImage != null,
       title: _nameController.text,
       price: _priceController.text,
       location: selectedArea!,
-      image: selectedAsset,
       description: _descController.text,
       phone: _phoneController.text,
       amenities: List.from(selectedAmenities),
@@ -95,15 +119,38 @@ class _AddListingPageState extends State<AddListingPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // IMAGE PREVIEW
-            Container(
-              height: 250,
-              width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(
-                  image: AssetImage(selectedAsset),
-                  fit: BoxFit.cover,
+            // IMAGE PREVIEW
+            GestureDetector(
+              onTap: _pickHouseImage, // Trigger the gallery picker
+              child: Container(
+                height: 250,
+                width: double.infinity,
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.grey[100],
+                  border: Border.all(color: Colors.pinkAccent.withOpacity(0.3)),
+                  image: DecorationImage(
+                    // LOGIC: Show FileImage if picked, otherwise show the AssetImage
+                    image: _selectedImage != null
+                        ? FileImage(_selectedImage!) as ImageProvider
+                        : AssetImage(selectedAsset) as ImageProvider,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // Optional: Add a "Click to change" overlay
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.pinkAccent,
+                      child: Icon(
+                        _selectedImage != null ? Icons.edit : Icons.add_a_photo,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -238,10 +285,11 @@ class _AddListingPageState extends State<AddListingPage> {
     bool isNumber = false,
     TextEditingController? controller,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: _inputDecoration(label, icon),
+      validator: (value) => value!.isEmpty ? "Required" : null,
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -55,7 +57,9 @@ class Profilepage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundImage: AssetImage(person.image),
+                    backgroundImage: person.isFromFile
+                        ? FileImage(File(person.image)) as ImageProvider
+                        : AssetImage(person.image) as ImageProvider,
                   ),
                   const SizedBox(height: 15),
                   Text(

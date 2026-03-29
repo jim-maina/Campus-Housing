@@ -1,4 +1,5 @@
 class Listing {
+  final bool isFromFile;
   final String title;
   final String price;
   final String location;
@@ -8,6 +9,7 @@ class Listing {
   final List<String> amenities;
 
   Listing({
+    this.isFromFile = false,
     required this.title,
     required this.price,
     required this.location,
@@ -241,6 +243,7 @@ class AppData {
 }
 
 class Roommate {
+  final bool isFromFile;
   final String name;
   final String phone;
   final String course;
@@ -252,6 +255,7 @@ class Roommate {
   final List<String> habits;
 
   Roommate({
+    this.isFromFile = false,
     required this.name,
     required this.phone,
     required this.course,

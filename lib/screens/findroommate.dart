@@ -1,5 +1,7 @@
 import 'package:campus_housing/screens/models/appdata.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class Findroommate extends StatefulWidget {
   const Findroommate({super.key});
@@ -9,7 +11,23 @@ class Findroommate extends StatefulWidget {
 }
 
 class _FindroommateState extends State<Findroommate> {
-  // 1. ADD CONTROLLERS
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (pickedFile == null) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _selectedImage = File(pickedFile.path);
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -34,6 +52,8 @@ class _FindroommateState extends State<Findroommate> {
   void _publishProfile() {
     if (_formKey.currentState!.validate()) {
       final newRoommate = Roommate(
+        image: _selectedImage != null ? _selectedImage!.path : selectedAsset,
+        isFromFile: _selectedImage != null,
         name: _nameController.text,
         phone: _phoneController.text,
         course: _courseController.text,
@@ -41,7 +61,6 @@ class _FindroommateState extends State<Findroommate> {
         status: lookingStatus!,
         budget: _budgetController.text,
         bio: _bioController.text,
-        image: selectedAsset,
         habits: List.from(selectedHabits),
       );
 
@@ -75,35 +94,46 @@ class _FindroommateState extends State<Findroommate> {
             children: [
               // PROFILE IMAGE SECTION
               Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      height: 150,
-                      width: 150,
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.pinkAccent, width: 3),
-                        image: DecorationImage(
-                          image: AssetImage(selectedAsset),
-                          fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: _pickImage, // Clicking the photo opens the gallery
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 150,
+                        width: 150,
+                        margin: const EdgeInsets.symmetric(vertical: 20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.pinkAccent,
+                            width: 3,
+                          ),
+                          image: _selectedImage != null
+                              ? DecorationImage(
+                                  image: FileImage(_selectedImage!),
+                                  fit: BoxFit.cover,
+                                )
+                              : DecorationImage(
+                                  image: AssetImage(selectedAsset),
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      right: 0,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.pinkAccent,
-                        radius: 20,
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
+                      Positioned(
+                        bottom: 20,
+                        right: 0,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.pinkAccent,
+                          radius: 20,
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 

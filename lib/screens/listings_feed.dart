@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:campus_housing/screens/findroommate.dart';
 import 'package:campus_housing/screens/mylisting.dart';
 import 'package:campus_housing/screens/profilepage.dart';
@@ -124,6 +126,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
@@ -139,6 +142,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
@@ -154,6 +158,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
@@ -169,6 +174,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
@@ -184,6 +190,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
@@ -199,12 +206,14 @@ class _ListingsFeedState extends State<ListingsFeed> {
                             'description': l.description,
                             'phone': l.phone,
                             'amenities': l.amenities,
+                            'isFromFile': l.isFromFile,
                           },
                         )
                         .toList(),
                   ),
                 ]),
               ),
+              // ROOMMATES TAB CONTENT
             ] else if (_selectedIndex == 2) ...[
               // 1. THE TOP "CALL TO ACTION" (Always stays at the top of the scroll)
               SliverToBoxAdapter(
@@ -434,7 +443,6 @@ class _ListingsFeedState extends State<ListingsFeed> {
   // Builds a card widget for a single house listing, which navigates to the details page when tapped
   Widget _buildHouseCard(Map<String, dynamic> house) {
     return InkWell(
-      // Navigate to the details page when tapped
       onTap: () {
         Navigator.push(
           context,
@@ -443,7 +451,6 @@ class _ListingsFeedState extends State<ListingsFeed> {
           ),
         );
       },
-      // Card design
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 240,
@@ -453,23 +460,23 @@ class _ListingsFeedState extends State<ListingsFeed> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                house['img'],
-                height: 180,
-                width: 240,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 180,
-                    width: 240,
-                    color: Colors.grey[200],
-                    child: const Icon(
-                      Icons.broken_image_outlined,
-                      color: Colors.grey,
+              child: house['isFromFile'] == true
+                  ? Image.file(
+                      File(house['img']),
+                      height: 180,
+                      width: 240,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildErrorImage(),
+                    )
+                  : Image.asset(
+                      house['img'], // Uses Asset for default photos
+                      height: 180,
+                      width: 240,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildErrorImage(),
                     ),
-                  );
-                },
-              ),
             ),
             const SizedBox(height: 10),
             Text(
@@ -486,6 +493,16 @@ class _ListingsFeedState extends State<ListingsFeed> {
           ],
         ),
       ),
+    );
+  }
+
+  // Helper for broken images
+  Widget _buildErrorImage() {
+    return Container(
+      height: 180,
+      width: 240,
+      color: Colors.grey[200],
+      child: const Icon(Icons.broken_image_outlined, color: Colors.grey),
     );
   }
 }
@@ -508,7 +525,12 @@ Widget _buildRoommateListItem(person, context) {
       ),
       child: Row(
         children: [
-          CircleAvatar(radius: 30, backgroundImage: AssetImage(person.image)),
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: person.isFromFile
+                ? FileImage(File(person.image)) as ImageProvider
+                : AssetImage(person.image) as ImageProvider,
+          ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
