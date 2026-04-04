@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'models/appdata.dart';
+import 'listingdetail.dart';
 
 class MyListingsPage extends StatefulWidget {
   const MyListingsPage({super.key});
@@ -8,7 +10,6 @@ class MyListingsPage extends StatefulWidget {
   State<MyListingsPage> createState() => _MyListingsPageState();
 }
 
-// This page displays the listings that the user has posted. It allows users to view their listings and delete them if they wish.
 class _MyListingsPageState extends State<MyListingsPage> {
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,6 @@ class _MyListingsPageState extends State<MyListingsPage> {
     );
   }
 
-  // Builds the UI for when there are no listings posted by the user
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -53,22 +53,56 @@ class _MyListingsPageState extends State<MyListingsPage> {
     );
   }
 
-  // Builds the UI for each listing card in the user's listings. It includes a delete button that allows users to remove their listings.
   Widget _buildMyListingCard(Listing house, int index) {
+    // Get the first image path safely
+    final String displayImage = house.images.isNotEmpty
+        ? house.images.first
+        : 'images/placeholder.jpg';
+
     return Card(
       margin: const EdgeInsets.only(bottom: 15),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 2,
       child: ListTile(
+        onTap: () {
+          // Allow the landlord to tap their own listing to see the detail view
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ListingDetailPage(
+                houseData: {
+                  'title': house.title,
+                  'price': house.price,
+                  'location': house.location,
+                  'img': displayImage,
+                  'images': house.images,
+                  'description': house.description,
+                  'phone': house.phone,
+                  'amenities': house.amenities,
+                  'isFromFile': house.isFromFile,
+                },
+              ),
+            ),
+          );
+        },
         contentPadding: const EdgeInsets.all(10),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            house.image,
-            width: 70,
-            height: 70,
-            fit: BoxFit.cover,
-          ),
+          child: house.isFromFile
+              ? Image.file(
+                  File(displayImage),
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _errorIcon(),
+                )
+              : Image.asset(
+                  displayImage,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _errorIcon(),
+                ),
         ),
         title: Text(
           house.title,
@@ -77,12 +111,18 @@ class _MyListingsPageState extends State<MyListingsPage> {
         subtitle: Text("Ksh ${house.price} • ${house.location}"),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-          onPressed: () {
-            // Confirm before deleting
-            _confirmDelete(index);
-          },
+          onPressed: () => _confirmDelete(index),
         ),
       ),
+    );
+  }
+
+  Widget _errorIcon() {
+    return Container(
+      width: 70,
+      height: 70,
+      color: Colors.grey[100],
+      child: const Icon(Icons.broken_image_outlined, color: Colors.grey),
     );
   }
 
@@ -90,12 +130,15 @@ class _MyListingsPageState extends State<MyListingsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Delete Listing?"),
-        content: const Text("Are you sure you want to remove this property?"),
+        content: const Text(
+          "Are you sure you want to remove this property? This action cannot be undone.",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -103,6 +146,9 @@ class _MyListingsPageState extends State<MyListingsPage> {
                 AppData.userListings.removeAt(index);
               });
               Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Listing removed successfully")),
+              );
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),

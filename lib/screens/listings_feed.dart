@@ -115,107 +115,40 @@ class _ListingsFeedState extends State<ListingsFeed> {
               SliverList(
                 delegate: SliverChildListDelegate([
                   const Divider(height: 40),
-                  _buildAreaRow(
+                  ...[
                     "Nchiru",
-                    Listings.where((l) => l.location == "Nchiru")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
-                  _buildAreaRow(
                     "Mascan",
-                    Listings.where((l) => l.location == "Mascan")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
-                  _buildAreaRow(
                     "Alaban",
-                    Listings.where((l) => l.location == "Alaban")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
-                  _buildAreaRow(
                     "Kunene",
-                    Listings.where((l) => l.location == "Kunene")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
-                  _buildAreaRow(
                     "Kianjae",
-                    Listings.where((l) => l.location == "Kianjae")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
-                  _buildAreaRow(
                     "Kaithe",
-                    Listings.where((l) => l.location == "Kaithe")
-                        .map(
-                          (l) => {
-                            'title': l.title,
-                            'price': l.price,
-                            'img': l.image,
-                            'description': l.description,
-                            'phone': l.phone,
-                            'amenities': l.amenities,
-                            'isFromFile': l.isFromFile,
-                          },
-                        )
-                        .toList(),
-                  ),
+                  ].map((area) {
+                    return _buildAreaRow(
+                      area,
+                      Listings.where((l) => l.location == area)
+                          .map(
+                            (l) => {
+                              'title': l.title,
+                              'price': l.price,
+
+                              'img': l.images.isNotEmpty
+                                  ? l.images.first
+                                  : 'images/placeholder.jpg',
+                              'images': l.images,
+                              'description': l.description,
+                              'phone': l.phone,
+                              'amenities': l.amenities,
+                              'isFromFile': l.isFromFile,
+                            },
+                          )
+                          .toList(),
+                    );
+                  }).toList(),
                 ]),
               ),
               // ROOMMATES TAB CONTENT
             ] else if (_selectedIndex == 2) ...[
-              // 1. THE TOP "CALL TO ACTION" (Always stays at the top of the scroll)
+              // THE TOP "CALL TO ACTION" (Always stays at the top of the scroll)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -507,6 +440,7 @@ class _ListingsFeedState extends State<ListingsFeed> {
   }
 }
 
+// Builds a list item widget for a roommate profile, which navigates to the profile page when tapped
 Widget _buildRoommateListItem(person, context) {
   return InkWell(
     onTap: () {

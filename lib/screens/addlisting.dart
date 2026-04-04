@@ -11,22 +11,11 @@ class AddListingPage extends StatefulWidget {
 }
 
 class _AddListingPageState extends State<AddListingPage> {
-  File? _selectedImage;
+  final _formKey = GlobalKey<FormState>();
+
+  // Multiple images logic
+  List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickHouseImage() async {
-    final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-    );
-
-    if (pickedFile != null) {
-      if (!mounted) return;
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
 
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
@@ -37,45 +26,26 @@ class _AddListingPageState extends State<AddListingPage> {
   String? selectedArea;
   List<String> selectedAmenities = [];
 
-  final List<String> availableAssets = [
-    'images/nchiru/bluehouse.jpg',
-    'images/nchiru/greenhouse.jpg',
-    'images/nchiru/orangehouse.jpg',
-    'images/nchiru/pinkhouse.jpg',
-    'images/nchiru/villahouse.jpg',
+  // Function to pick multiple images
+  Future<void> _pickMultiImages() async {
+    final List<XFile> pickedFiles = await _picker.pickMultiImage(
+      imageQuality: 80,
+    );
 
-    'images/mascan/mascan.jpg',
-    'images/mascan/studiohouse.jpg',
-    'images/mascan/cozyhouse.jpg',
-    'images/mascan/funvilla.jpg',
-    'images/mascan/campusvilla.jpg',
-
-    'images/alaban/unitygardens.jpg',
-    'images/alaban/freedomhouse.jpg',
-    'images/alaban/ubuntuhouse.jpg',
-    'images/alaban/sunsetvilla.jpg',
-    'images/alaban/commonwealthhouse.jpg',
-
-    'images/kunene/qweturesidences.jpg',
-    'images/kunene/campusview.jpg',
-    'images/kunene/scholarcorners.jpg',
-    'images/kunene/nextdoorresidences.jpg',
-    'images/kunene/studentsquare.jpg',
-
-    'images/kianjae/unityflats.jpg',
-    'images/kianjae/vibingvilla.jpg',
-    'images/kianjae/cornerstoneridge.jpg',
-    'images/kianjae/studyyardresidences.jpg',
-    'images/kianjae/campusgreen.jpg',
-
-    'images/kaithe/tajiriresidences.jpg',
-    'images/kaithe/studios.jpg',
-    'images/kaithe/fancyflats.jpg',
-    'images/kaithe/studenthub.jpg',
-    'images/kaithe/youthvilla.jpg',
-  ];
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _selectedImages.addAll(
+          pickedFiles.map((file) => File(file.path)).toList(),
+        );
+      });
+    }
+  }
 
   void _publishListing() {
+    // Validate form fields
+    if (!_formKey.currentState!.validate()) return;
+
+    // Validate location
     if (selectedArea == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a Location/Area")),
@@ -83,9 +53,15 @@ class _AddListingPageState extends State<AddListingPage> {
       return;
     }
 
+    // Prepare image paths
+    // If user picked files, use them. If not, use the selected default asset.
+    List<String> finalImagePaths = _selectedImages.isNotEmpty
+        ? _selectedImages.map((f) => f.path).toList()
+        : [selectedAsset];
+
     final newListing = Listing(
-      image: _selectedImage != null ? _selectedImage!.path : selectedAsset,
-      isFromFile: _selectedImage != null,
+      images: finalImagePaths,
+      isFromFile: _selectedImages.isNotEmpty,
       title: _nameController.text,
       price: _priceController.text,
       location: selectedArea!,
@@ -115,166 +91,278 @@ class _AddListingPageState extends State<AddListingPage> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // IMAGE PREVIEW
-            // IMAGE PREVIEW
-            GestureDetector(
-              onTap: _pickHouseImage, // Trigger the gallery picker
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- MULTI-IMAGE GALLERY PREVIEW ---
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  "Property Gallery (Tap + to add photos)",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              _buildImageScroll(),
+
+              const SizedBox(height: 20),
+
+              // --- ASSET PICKER (Fallback) ---
+              if (_selectedImages.isEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    "Or select a default theme photo",
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildAssetPicker(),
+              ],
+
+              const SizedBox(height: 25),
+
+              // --- FORM SECTION ---
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    _buildInput(
+                      "Hostel/Villa Name",
+                      Icons.business,
+                      controller: _nameController,
+                    ),
+                    const SizedBox(height: 15),
+
+                    DropdownButtonFormField<String>(
+                      decoration: _inputDecoration(
+                        "Location",
+                        Icons.location_on,
+                      ),
+                      items:
+                          [
+                                "Nchiru",
+                                "Mascan",
+                                "Alaban",
+                                "Kunene",
+                                "Kianjae",
+                                "Kaithe",
+                              ]
+                              .map(
+                                (area) => DropdownMenuItem(
+                                  value: area,
+                                  child: Text(area),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (val) => selectedArea = val,
+                      validator: (value) => value == null ? "Required" : null,
+                    ),
+
+                    const SizedBox(height: 15),
+                    _buildInput(
+                      "Monthly Rent (Ksh)",
+                      Icons.monetization_on,
+                      isNumber: true,
+                      controller: _priceController,
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    TextFormField(
+                      controller: _descController,
+                      maxLines: 4,
+                      decoration: _inputDecoration(
+                        "Description",
+                        Icons.description,
+                      ).copyWith(alignLabelWithHint: true),
+                      validator: (value) => value!.isEmpty ? "Required" : null,
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    _buildInput(
+                      "Phone Number (e.g. 0712...)",
+                      Icons.phone_android_outlined,
+                      isNumber: true,
+                      controller: _phoneController,
+                    ),
+                    const SizedBox(height: 30),
+
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Amenities Included",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        "WiFi",
+                        "Water",
+                        "Security",
+                        "Hot Shower",
+                      ].map((a) => _amenityChip(a)).toList(),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // PUBLISH BUTTON
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pinkAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        onPressed: _publishListing,
+                        child: const Text(
+                          "Publish Listing",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Horizontal scroll for picked images
+  Widget _buildImageScroll() {
+    return SizedBox(
+      height: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _selectedImages.length + 1,
+        itemBuilder: (context, index) {
+          if (index == _selectedImages.length) {
+            // Add Button
+            return GestureDetector(
+              onTap: _pickMultiImages,
               child: Container(
-                height: 250,
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
+                width: 120,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
                   color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(15),
                   border: Border.all(color: Colors.pinkAccent.withOpacity(0.3)),
+                ),
+                child: const Icon(Icons.add_a_photo, color: Colors.pinkAccent),
+              ),
+            );
+          }
+
+          // Image Preview with Delete Button
+          return Stack(
+            children: [
+              Container(
+                width: 120,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
                   image: DecorationImage(
-                    // LOGIC: Show FileImage if picked, otherwise show the AssetImage
-                    image: _selectedImage != null
-                        ? FileImage(_selectedImage!) as ImageProvider
-                        : AssetImage(selectedAsset) as ImageProvider,
+                    image: FileImage(_selectedImages[index]),
                     fit: BoxFit.cover,
                   ),
                 ),
-                // Optional: Add a "Click to change" overlay
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.pinkAccent,
-                      child: Icon(
-                        _selectedImage != null ? Icons.edit : Icons.add_a_photo,
-                        color: Colors.white,
-                      ),
-                    ),
+              ),
+              Positioned(
+                top: 5,
+                right: 17,
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedImages.removeAt(index)),
+                  child: const CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.red,
+                    child: Icon(Icons.close, size: 14, color: Colors.white),
                   ),
                 ),
               ),
-            ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
-            // ASSET GALLERY PICKER
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "Select Property Photo",
-                style: TextStyle(fontWeight: FontWeight.bold),
+  Widget _buildAssetPicker() {
+    return SizedBox(
+      height: 70,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 30,
+        itemBuilder: (context, index) {
+          final asset = [
+            'images/nchiru/bluehouse.jpg',
+            'images/nchiru/greenhouse.jpg',
+            'images/nchiru/orangehouse.jpg',
+            'images/nchiru/pinkhouse.jpg',
+            'images/nchiru/villahouse.jpg',
+
+            'images/mascan/mascan.jpg',
+            'images/mascan/studiohouse.jpg',
+            'images/mascan/cozyhouse.jpg',
+            'images/mascan/funvilla.jpg',
+            'images/mascan/campusvilla.jpg',
+
+            'images/alaban/unitygardens.jpg',
+            'images/alaban/freedomhouse.jpg',
+            'images/alaban/ubuntuhouse.jpg',
+            'images/alaban/sunsetvilla.jpg',
+            'images/alaban/commonwealthhouse.jpg',
+
+            'images/kunene/qweturesidences.jpg',
+            'images/kunene/campusview.jpg',
+            'images/kunene/scholarcorners.jpg',
+            'images/kunene/nextdoorresidences.jpg',
+            'images/kunene/studentsquare.jpg',
+
+            'images/kianjae/unityflats.jpg',
+            'images/kianjae/vibingvilla.jpg',
+            'images/kianjae/cornerstoneridge.jpg',
+            'images/kianjae/studyyardresidences.jpg',
+            'images/kianjae/campusgreen.jpg',
+
+            'images/kaithe/tajiriresidences.jpg',
+            'images/kaithe/studios.jpg',
+            'images/kaithe/fancyflats.jpg',
+            'images/kaithe/studenthub.jpg',
+            'images/kaithe/youthvilla.jpg',
+          ][index];
+          return GestureDetector(
+            onTap: () => setState(() => selectedAsset = asset),
+            child: Container(
+              width: 70,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: selectedAsset == asset
+                      ? Colors.pinkAccent
+                      : Colors.transparent,
+                  width: 2,
+                ),
+                image: DecorationImage(
+                  image: AssetImage(asset),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            const SizedBox(height: 10),
-            _buildGalleryPicker(),
-
-            const SizedBox(height: 25),
-
-            // FORM SECTION
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  _buildInput(
-                    "Hostel/Villa Name",
-                    Icons.business,
-                    controller: _nameController,
-                  ),
-                  const SizedBox(height: 15),
-
-                  DropdownButtonFormField<String>(
-                    decoration: _inputDecoration("Location", Icons.location_on),
-                    items:
-                        [
-                              "Nchiru",
-                              "Mascan",
-                              "Alaban",
-                              "Kunene",
-                              "Kianjae",
-                              "Kaithe",
-                            ]
-                            .map(
-                              (area) => DropdownMenuItem(
-                                value: area,
-                                child: Text(area),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (val) => selectedArea = val,
-                  ),
-
-                  const SizedBox(height: 15),
-                  _buildInput(
-                    "Monthly Rent (Ksh)",
-                    Icons.monetization_on,
-                    isNumber: true,
-                    controller: _priceController,
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  // DESCRIPTION FIELD
-                  TextField(
-                    controller: _descController,
-                    maxLines: 4,
-                    decoration: _inputDecoration(
-                      "Description",
-                      Icons.description,
-                    ).copyWith(alignLabelWithHint: true),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  _buildInput(
-                    "Phone Number (e.g. 0712...)",
-                    Icons.phone_android_outlined,
-                    isNumber: true,
-                    controller: _phoneController,
-                  ),
-                  const SizedBox(height: 40),
-
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Amenities Included",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      "WiFi",
-                      "Water",
-                      "Security",
-                      "Hot Shower",
-                    ].map((a) => _amenityChip(a)).toList(),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // PUBLISH BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      onPressed: _publishListing, // Calls our new logic
-                      child: const Text(
-                        "Publish Listing",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -306,39 +394,6 @@ class _AddListingPageState extends State<AddListingPage> {
     );
   }
 
-  Widget _buildGalleryPicker() {
-    return SizedBox(
-      height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: availableAssets.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () => setState(() => selectedAsset = availableAssets[index]),
-            child: Container(
-              width: 80,
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: selectedAsset == availableAssets[index]
-                      ? Colors.pinkAccent
-                      : Colors.transparent,
-                  width: 3,
-                ),
-                image: DecorationImage(
-                  image: AssetImage(availableAssets[index]),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   Widget _amenityChip(String label) {
     bool isSelected = selectedAmenities.contains(label);
     return FilterChip(
@@ -356,7 +411,6 @@ class _AddListingPageState extends State<AddListingPage> {
     );
   }
 
-  // SUCCESS DIALOG
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -370,8 +424,8 @@ class _AddListingPageState extends State<AddListingPage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Go back to Feed
+              Navigator.pop(context);
+              Navigator.pop(context);
             },
             child: const Text("Awesome!"),
           ),

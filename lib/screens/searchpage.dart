@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:campus_housing/screens/listingdetail.dart';
 import 'package:flutter/material.dart';
 import 'models/appdata.dart';
@@ -15,10 +16,8 @@ class _SearchPageState extends State<SearchPage> {
   List<Map<String, dynamic>> _getProcessedList(String query) {
     if (query.trim().isEmpty) return [];
 
-    // Combine both predefined listings and user-added listings
     final allListings = [...AppData.listings, ...AppData.userListings];
 
-    // Filter and convert to Map format for easier handling in the UI
     return allListings
         .where((house) {
           final searchLower = query.trim().toLowerCase();
@@ -27,16 +26,23 @@ class _SearchPageState extends State<SearchPage> {
         })
         .map(
           (l) => {
-            // Convert Listing to a Map for easier handling in the UI
             'title': l.title,
             'price': l.price,
             'location': l.location,
-            'img': l.image,
+
+            'img': l.images.isNotEmpty
+                ? l.images.first
+                : 'images/placeholder.jpg',
+
+            'images': l.images,
+            'description': l.description,
+            'phone': l.phone,
+            'isFromFile': l.isFromFile,
+            'amenities': l.amenities,
           },
         )
         .toList()
       ..sort((a, b) {
-        // Sort by price (ascending)
         int priceA = int.tryParse(a['price'].toString()) ?? 0;
         int priceB = int.tryParse(b['price'].toString()) ?? 0;
         return priceA.compareTo(priceB);
@@ -44,7 +50,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   @override
-  // This method builds the UI of the SearchPage
   Widget build(BuildContext context) {
     final filteredList = _getProcessedList(_searchText);
 
@@ -86,14 +91,23 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            house['img'],
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stack) =>
-                                const Icon(Icons.home, size: 40),
-                          ),
+                          child: house['isFromFile']
+                              ? Image.file(
+                                  File(house['img']),
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stack) =>
+                                      _errorPlaceholder(),
+                                )
+                              : Image.asset(
+                                  house['img'],
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stack) =>
+                                      _errorPlaceholder(),
+                                ),
                         ),
                         title: Text(
                           house['title'],
@@ -113,6 +127,15 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _errorPlaceholder() {
+    return Container(
+      width: 60,
+      height: 60,
+      color: Colors.grey[100],
+      child: const Icon(Icons.home, color: Colors.grey),
     );
   }
 }

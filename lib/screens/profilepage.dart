@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 // 1. Function to open WhatsApp
 Future<void> _launchWhatsApp(String phone, String name) async {
-  // Format the message to be professional
   String formattedPhone = phone;
   if (phone.startsWith('0')) {
     formattedPhone = '254${phone.substring(1)}';
@@ -38,6 +37,7 @@ class Profilepage extends StatelessWidget {
   const Profilepage({super.key, required this.person});
 
   @override
+  // This method builds the UI of the Profilepage, displaying the roommate's information and providing contact options
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -51,7 +51,7 @@ class Profilepage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. TOP SECTION (Identity)
+            // TOP SECTION (Identity)
             Center(
               child: Column(
                 children: [
@@ -89,7 +89,7 @@ class Profilepage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // 2. KEY INFO (The scannable grid)
+            // KEY INFO (The scannable grid)
             const Text(
               "Key Info",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -120,7 +120,7 @@ class Profilepage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // 3. LIFESTYLE / QUALITIES (Chips)
+            //  LIFESTYLE / QUALITIES (Chips)
             const Text(
               "Lifestyle",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -146,7 +146,7 @@ class Profilepage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // 4. ABOUT SECTION
+            //  ABOUT SECTION
             const Text(
               "About Me",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -162,7 +162,7 @@ class Profilepage extends StatelessWidget {
         ),
       ),
 
-      // 5. CONTACT BUTTON (Fixed at bottom)
+      // CONTACT BUTTON (Fixed at bottom)
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         color: Colors.white,
@@ -205,6 +205,7 @@ class Profilepage extends StatelessWidget {
     );
   }
 
+  // This method builds a row widget for displaying key information about the roommate in a structured format
   Widget _infoRow(IconData icon, String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

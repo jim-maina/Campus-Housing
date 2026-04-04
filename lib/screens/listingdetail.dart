@@ -1,13 +1,20 @@
-import 'dart:io'; // CRITICAL: Required to read from phone storage
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ListingDetailPage extends StatelessWidget {
+class ListingDetailPage extends StatefulWidget {
   final Map<String, dynamic> houseData;
 
   const ListingDetailPage({super.key, required this.houseData});
 
-  // Function to trigger the phone dialer
+  @override
+  State<ListingDetailPage> createState() => _ListingDetailPageState();
+}
+
+class _ListingDetailPageState extends State<ListingDetailPage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
   Future<void> _callLandlord(String phone) async {
     final Uri url = Uri.parse("tel:$phone");
     if (await canLaunchUrl(url)) {
@@ -19,32 +26,73 @@ class ListingDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isFromFile = houseData['isFromFile'] ?? false;
-    final String imagePath = houseData['img'] ?? '';
+    final bool isFromFile = widget.houseData['isFromFile'] ?? false;
+    // Get the list of images for the gallery (either from file paths or asset paths)
+    final List<dynamic> imageList =
+        widget.houseData['images'] ?? [widget.houseData['img']];
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: 350, // Increased height for better gallery viewing
             pinned: true,
             backgroundColor: Colors.pinkAccent,
             flexibleSpace: FlexibleSpaceBar(
-              // DYNAMIC IMAGE LOADING LOGIC
-              background: isFromFile
-                  ? Image.file(
-                      File(imagePath),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildErrorPlaceholder(),
-                    )
-                  : Image.asset(
-                      imagePath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildErrorPlaceholder(),
+              background: Stack(
+                children: [
+                  // SWIPEABLE IMAGE GALLERY
+                  PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (int page) =>
+                        setState(() => _currentPage = page),
+                    itemCount: imageList.length,
+                    itemBuilder: (context, index) {
+                      final String path = imageList[index];
+                      return isFromFile
+                          ? Image.file(
+                              File(path),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, e, s) =>
+                                  _buildErrorPlaceholder(),
+                            )
+                          : Image.asset(
+                              path,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, e, s) =>
+                                  _buildErrorPlaceholder(),
+                            );
+                    },
+                  ),
+
+                  // --- PAGE INDICATOR (Dots) ---
+                  if (imageList.length > 1)
+                    Positioned(
+                      bottom: 20,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          imageList.length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            height: 8,
+                            width: _currentPage == index ? 24 : 8,
+                            decoration: BoxDecoration(
+                              color: _currentPage == index
+                                  ? Colors.white
+                                  : Colors.white54,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
+                ],
+              ),
             ),
             leading: IconButton(
               icon: const CircleAvatar(
@@ -54,18 +102,20 @@ class ListingDetailPage extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
           ),
+
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // --- TITLE & PRICE ---
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
-                          houseData['title'] ?? "Unnamed Property",
+                          widget.houseData['title'] ?? "Unnamed Property",
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -73,7 +123,7 @@ class ListingDetailPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Ksh ${houseData['price']}",
+                        "Ksh ${widget.houseData['price']}",
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.pinkAccent,
@@ -83,6 +133,8 @@ class ListingDetailPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
+
+                  // --- LOCATION ---
                   Row(
                     children: [
                       const Icon(
@@ -92,21 +144,22 @@ class ListingDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        houseData['location'] ?? "Location unknown",
+                        widget.houseData['location'] ?? "Location unknown",
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
                   const Divider(height: 40),
 
+                  // --- DESCRIPTION ---
                   const Text(
                     "Description",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    houseData['description'] ??
-                        "No description provided by the landlord.",
+                    widget.houseData['description'] ??
+                        "No description provided.",
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 15,
@@ -115,18 +168,20 @@ class ListingDetailPage extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 20),
+
+                  // --- AMENITIES ---
                   const Text(
                     "Amenities",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-
-                  // AMENITIES CHIPS
                   Wrap(
                     spacing: 8,
                     runSpacing: 4,
                     children:
-                        (houseData['amenities'] as List<dynamic>?)?.map((item) {
+                        (widget.houseData['amenities'] as List<dynamic>?)?.map((
+                          item,
+                        ) {
                           return Chip(
                             label: Text(item.toString()),
                             backgroundColor: Colors.pinkAccent.withOpacity(
@@ -156,7 +211,7 @@ class ListingDetailPage extends StatelessWidget {
         ],
       ),
 
-      // BOTTOM CONTACT BUTTON
+      // --- STICKY BOTTOM BUTTON ---
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -177,7 +232,7 @@ class ListingDetailPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          onPressed: () => _callLandlord(houseData['phone'] ?? ""),
+          onPressed: () => _callLandlord(widget.houseData['phone'] ?? ""),
           icon: const Icon(Icons.phone, color: Colors.white),
           label: const Text(
             "Contact Landlord",
@@ -192,7 +247,6 @@ class ListingDetailPage extends StatelessWidget {
     );
   }
 
-  // Helper widget to show if an image fails to load
   Widget _buildErrorPlaceholder() {
     return Container(
       color: Colors.grey[200],
